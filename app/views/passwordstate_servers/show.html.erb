@@ -1,0 +1,37 @@
+<% title @passwordstate_server.name %>
+<% title_actions \
+  link_to_if_authorized(_('Edit'), hash_for_edit_passwordstate_server_path(@passwordstate_server).merge(:auth_object => @passwordstate_server), class: 'btn btn-default') %>
+<% javascript 'foreman_passwordstate/passwordstate_servers' %>
+
+<ul class="nav nav-tabs" data-tabs="tabs">
+  <li class="active"><a href="#primary" data-toggle="tab"><%= _('Passwordstate Server') %></a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="primary">
+    <table class="<%= table_css_classes 'table-fixed' %>">
+      <thead>
+        <tr>
+          <th class="col-md-1"><%= _('Property') %></th>
+          <th class="col-md-11"><%= _('Value') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%- unless @passwordstate_server.description.empty? -%>
+        <tr>
+          <td><%= _('Description') %></td>
+          <td><%= @passwordstate_server.description %></td>
+        </tr>
+        <%- end -%>
+        <tr>
+          <td><%= _('Url') %></td>
+          <td><a href="<%= @passwordstate_server.url %>"><%= @passwordstate_server.url %></a></td>
+        </tr>
+        <tr>
+          <td><%= _('Version') %></td>
+          <td><%= @passwordstate_server.version %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

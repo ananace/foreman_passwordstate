@@ -1,0 +1,56 @@
+class PasswordstateServer < ApplicationRecord
+  include Taxonomix
+  include Encryptable
+
+  extend FriendlyId
+  friendly_id :name
+  include Parameterizable::ByIdName
+  encrypts :password
+
+  validates_lengths_from_database
+
+  audited except: %i[password]
+
+  before_destroy EnsureNotUsedBy.new :hosts
+  has_many :passwordstate_facets,
+           class_name: '::ForemanPasswordstate::PasswordstateFacet',
+           dependent: :nullify,
+           inverse_of: :passwordstate_server
+
+  has_many :hosts,
+           class_name: '::Host::Managed',
+           dependent: :nullify,
+           inverse_of: :passwordstate_server,
+           through: :passwordstate_facets
+
+  validates :name, presence: true, uniqueness: true
+  validates :url, presence: true
+  validates :api_type, presence: true
+
+  # TODO: Validate User + Password or only APIKey
+
+  scoped_search on: :name
+  default_scope -> { order('passwordstate_servers.name') }
+
+  delegate :version, :documents, :folders, :hosts, :password_lists, :passwords, :reporting, to: :client
+
+  def test_connection
+    return false unless url
+    client.valid?
+  end
+
+  private
+
+  def client
+    require 'passwordstate'
+
+    @client ||= Passwordstate::Client.new(url, api_type: api_type.to_sym).tap do |cl|
+      if api_type == :api
+        cl.auth_data = { apikey: password }
+      else
+        cl.auth_data = { username: user, password: password }
+        # cl.auth_data[:domain] = domain if domain
+      end
+    end
+  end
+end
