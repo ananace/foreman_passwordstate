@@ -14,7 +14,7 @@ See the [Plugins install instructions, advanced installation from gems](https://
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ananace/foreman_passwordstate
+Bug reports and pull requests are welcome on GitHub at https://github.com/ananace/foreman_passwordstate  
 The project lives at https://gitlab.liu.se/ITI/foreman_passwordstate
 
 ## License
