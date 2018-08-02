@@ -23,7 +23,7 @@ module ForemanPasswordstate
              caption: N_('Passwordstate Servers'),
              parent: :infrastructure_menu
 
-        # register_facet ForemanPasswordstate::PasswordstateFacet, :passwordstate_facet
+        register_facet ForemanPasswordstate::PasswordstateFacet, :passwordstate_facet
         parameter_filter Host::Managed, passwordstate_facet_attributes: %i[passwordstate_server_id]
       end
     end
