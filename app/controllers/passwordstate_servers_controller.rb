@@ -2,7 +2,7 @@ class PasswordstateServersController < ::ApplicationController
   include Foreman::Controller::AutoCompleteSearch
   include Foreman::Controller::Parameters::PasswordstateServer
 
-  before_action :find_server, except: %i[index new create]
+  before_action :find_server, except: %i[index new create test_connection]
 
   def index
     @passwordstate_servers = resource_base_search_and_page
