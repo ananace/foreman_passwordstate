@@ -1,6 +1,6 @@
 # Foreman Passwordstate
 
-A plugin to link Foreman to a Passwordstate instance.
+A plugin to delegate host password handling from Foreman to a Passwordstate instance.
 
 ## Compatibility
 
