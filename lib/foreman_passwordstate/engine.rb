@@ -45,7 +45,7 @@ module ForemanPasswordstate
 
     config.to_prepare do
       begin
-        # Host::Managed.send(:prepend, ForemanPasswordstate::HostExtensions)
+        Host::Managed.send(:prepend, ForemanPasswordstate::HostManagedExtensions)
         # HostsController.send(:prepend, ForemanPasswordstate::HostsControllerExtensions)
       rescue StandardError => e
         Rails.logger.fatal "foreman_passwordstate: skipping engine hook (#{e})"

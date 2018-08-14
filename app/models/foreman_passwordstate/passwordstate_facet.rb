@@ -10,7 +10,9 @@ module ForemanPasswordstate
 
     validates :host, presence: true, allow_blank: false
 
-    # TODO: Per-host Password lists?
+    def password_list
+      return nil unless password_list_id
+      passwordstate_server.password_lists.get(password_list_id)
+    end
   end
 end
-
