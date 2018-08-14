@@ -33,8 +33,11 @@ module ForemanPasswordstate
     end
 
     def root_pass
-      pw = host_pass('root')
-      operatingsystem.nil? ? PasswordCrypt.passw_crypt(pw.password) : PasswordCrypt.passw_crypt(pw.password, operatingsystem.password_hash)
+      # Just to not thoroughly hammer the passwordstate server
+      Rails.cache.fetch("#{cache_key}/root_pass", expires_in: 5.minutes) do
+        pw = host_pass('root')
+        operatingsystem.nil? ? PasswordCrypt.passw_crypt(pw.password) : PasswordCrypt.passw_crypt(pw.password, operatingsystem.password_hash)
+      end
     end
   end
 end
