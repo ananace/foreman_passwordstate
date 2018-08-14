@@ -54,10 +54,17 @@ class PasswordstateServersController < ::ApplicationController
     render partial: 'form', locals: { passwordstate_server: @passwordstate_server }
   end
 
+  def folders
+    @passwordstate_server.folders
+  end
+
+  def password_lists
+    @passwordstate_server.password_lists
+  end
+
   private
 
   def find_server
     @passwordstate_server = PasswordstateServer.find(params[:id])
   end
 end
-

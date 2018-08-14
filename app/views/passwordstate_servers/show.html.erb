@@ -5,6 +5,8 @@
 
 <ul class="nav nav-tabs" data-tabs="tabs">
   <li class="active"><a href="#primary" data-toggle="tab"><%= _('Passwordstate Server') %></a></li>
+  <li><a href="#folders" data-toggle="tab"><%= _('Folders') %></a></li>
+  <li><a href="#password-lists" data-toggle="tab"><%= _('Password lists') %></a></li>
 </ul>
 
 <div class="tab-content">
@@ -31,6 +33,46 @@
           <td><%= _('Version') %></td>
           <td><%= @passwordstate_server.version %></td>
         </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane" id="folders">
+    <table class="<%= table_css_classes 'table-fixed' %>">
+      <thead>
+        <tr>
+          <th class="col-md-1"><%= _('Name') %></th>
+          <th class="col-md-2"><%= _('Path') %></th>
+          <th class="col-md-9"><%= _('Description') %></th>
+        </tr>
+      </thead>
+      <tbody>
+      <%- @passwordstate_server.folders.each do |folder| -%>
+        <tr>
+          <td><%= folder.folder_name %></td>
+          <td><%= folder.full_path(true) %></td>
+          <td><%= folder.description %></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane" id="password-lists">
+    <table class="<%= table_css_classes 'table-fixed' %>">
+      <thead>
+        <tr>
+          <th class="col-md-1"><%= _('Name') %></th>
+          <th class="col-md-2"><%= _('Full Path') %></th>
+          <th class="col-md-9"><%= _('Description') %></th>
+        </tr>
+      </thead>
+      <tbody>
+      <%- @passwordstate_server.password_lists.each do |list| -%>
+        <tr>
+          <td><%= list.password_list %></td>
+          <td><%= list.full_path(true) %></td>
+          <td><%= list.description %></td>
+        </tr>
+      <%- end -%>
       </tbody>
     </table>
   </div>
