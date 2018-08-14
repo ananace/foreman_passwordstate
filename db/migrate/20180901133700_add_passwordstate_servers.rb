@@ -15,8 +15,9 @@ class AddPasswordstateServers < ActiveRecord::Migration[5.1]
       t.references :host, null: false, foreign_key: true, index: true, unique: true
       t.references :passwordstate_server, foreign_key: true, index: true
 
+      t.integer :password_list_id, null: false
+
       t.timestamps null: false
     end
   end
 end
-
