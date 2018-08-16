@@ -34,9 +34,18 @@ module ForemanPasswordstate
 
     def root_pass
       # Just to not thoroughly hammer the passwordstate server
-      Rails.cache.fetch("#{cache_key}/root_pass", expires_in: 5.minutes) do
+      Rails.cache.fetch("#{cache_key}/root_pass", expires_in: 1.minute) do
         pw = host_pass('root')
-        operatingsystem.nil? ? PasswordCrypt.passw_crypt(pw.password) : PasswordCrypt.passw_crypt(pw.password, operatingsystem.password_hash)
+        alg = operatingsystem&.password_hash || 'SHA256'
+        if alg == 'Base64'
+          pw = PasswordCrypt.passw_crypt(pw.password, alg)
+        else
+          seed = "#{cache_key}/#{pw.title}-#{pw.password_id}"
+          rand = Random.new(seed.hash)
+          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[alg]}#{Base64.strict_encode64(rand.bytes(6))}")
+        end
+        pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
+        pw
       end
     end
   end
