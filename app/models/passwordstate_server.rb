@@ -48,8 +48,13 @@ class PasswordstateServer < ApplicationRecord
       if api_type == :api
         cl.auth_data = { apikey: password }
       else
+        if (separator = ['/', '\\', '@'].find { |sep| user.include? sep }) && user.count(separator) == 1
+          domain, user = user.split(separator)
+          domain, user = user, domain if separator == '@'
+        end
+
         cl.auth_data = { username: user, password: password }
-        # cl.auth_data[:domain] = domain if domain
+        cl.auth_data[:domain] = domain if domain
       end
     end
   end
