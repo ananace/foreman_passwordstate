@@ -1,0 +1,21 @@
+<%-
+  item = @hostgroup || @host
+-%>
+
+<%= fields_for item do |f| %>
+<%= f.fields_for 'passwordstate_facet_attributes' do |f| %>
+  <%-
+    servers = PasswordstateServer.all.map do |server|
+      [ server.id, "#{server.name} - #{server.url}" ]
+    end
+    server = item.try(:passwordstate_server) rescue nil
+  -%>
+  <%= select_f f, :passwordstate_server_id, servers, :first, :last,
+    { include_blank: true, selected: server&.id },
+    { disabled: servers.empty?,
+      help_inline: :indicator,
+      label: _('Passwordstate Server')
+    }
+  %>
+<% end -%>
+<% end -%>
