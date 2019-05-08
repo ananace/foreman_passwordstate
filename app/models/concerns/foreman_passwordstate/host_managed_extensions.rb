@@ -17,30 +17,35 @@ module ForemanPasswordstate
     delegate :passwordstate_server, to: :passwordstate_facet
     delegate :password_list, to: :passwordstate_facet, prefix: :passwordstate
 
+    def host_pass(username, create: true, **params)
+      return nil unless passwordstate_facet
 
-    def host_pass(username, create = true)
-      return super unless passwordstate_facet
       list = passwordstate_password_list
 
       # TODO: If Hosts enabled
       # pw = list.search(host_name: name, user_name: 'root')
 
       begin
-        list.passwords.search(title: "#{username}@#{name}", user_name: username).first
-      rescue Passwordstate::NotFoundError
-        list.passwords.create title: "#{username}@#{name}", user_name: username, generate_password: true if create
+        list.passwords.search(params.merge(title: "#{username}@#{name}", user_name: username)).first
+      rescue Passwordstate::NotFoundError => e
+        return list.passwords.create params.merge(title: "#{username}@#{name}", user_name: username, generate_password: true) if create
+
+        raise e
       end
     end
 
     def root_pass
-      # Just to not thoroughly hammer the passwordstate server
-      Rails.cache.fetch("#{cache_key}/root_pass", expires_in: 1.minute) do
+      return super unless passwordstate_facet
+
+      # As template renders read the root password multiple times,
+      # add a short cache just to not thoroughly hammer the passwordstate server
+      PasswordstateCache.instance.fetch("#{cache_key}/root_pass", expires_in: 1.minute) do
         pw = host_pass('root')
         alg = operatingsystem&.password_hash || 'SHA256'
         if alg == 'Base64'
           pw = PasswordCrypt.passw_crypt(pw.password, alg)
         else
-          seed = "#{cache_key}/#{pw.title}-#{pw.password_id}"
+          seed = "#{uuid || id}/#{pw.title}-#{pw.password_id}"
           rand = Random.new(seed.hash)
           pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[alg]}#{Base64.strict_encode64(rand.bytes(6))}")
         end
