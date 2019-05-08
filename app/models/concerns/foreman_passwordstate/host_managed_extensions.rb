@@ -48,8 +48,7 @@ module ForemanPasswordstate
           pw = pw.password
         else
           seed = "#{uuid || id}/#{pw.title}-#{pw.password_id}"
-          rand = Random.new(Digest::SHA1.digest(seed).unpack1('Q'))
-          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[alg]}#{Base64.strict_encode64(rand.bytes(6))}")
+          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[alg]}#{Base64.strict_encode64(Digest::SHA1.digest(seed))}")
         end
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
         pw
