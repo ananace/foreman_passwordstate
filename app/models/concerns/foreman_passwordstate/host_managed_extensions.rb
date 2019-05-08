@@ -17,7 +17,7 @@ module ForemanPasswordstate
     delegate :passwordstate_server, to: :passwordstate_facet
     delegate :password_list, to: :passwordstate_facet, prefix: :passwordstate
 
-    def host_pass(username, create: true, **params)
+    def password_entry(username, create: true, **params)
       return nil unless passwordstate_facet
 
       list = passwordstate_password_list
@@ -34,16 +34,18 @@ module ForemanPasswordstate
       end
     end
 
-    def root_pass
-      return super unless passwordstate_facet
+    def host_pass(username, password_hash: 'SHA256', create: true, **params)
+      return nil unless passwordstate_facet
 
       # As template renders read the root password multiple times,
       # add a short cache just to not thoroughly hammer the passwordstate server
-      PasswordstateCache.instance.fetch("#{cache_key}/root_pass", expires_in: 1.minute) do
-        pw = host_pass('root')
-        alg = operatingsystem&.password_hash || 'SHA256'
+      PasswordstateCache.instance.fetch("#{cache_key}/pass-#{username}", expires_in: 1.minute) do
+        pw = password_entry(username, create: create, **params)
+        alg = password_hash || 'SHA256'
         if alg == 'Base64'
           pw = PasswordCrypt.passw_crypt(pw.password, alg)
+        elsif alg == 'None'
+          pw = pw.password
         else
           seed = "#{uuid || id}/#{pw.title}-#{pw.password_id}"
           rand = Random.new(seed.hash)
@@ -52,6 +54,12 @@ module ForemanPasswordstate
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
         pw
       end
+    end
+
+    def root_pass
+      return super unless passwordstate_facet
+
+      host_pass('root', password_hash: operatingsystem&.password_hash)
     end
   end
 end
