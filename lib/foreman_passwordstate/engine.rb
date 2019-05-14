@@ -24,21 +24,22 @@ module ForemanPasswordstate
              parent: :infrastructure_menu
 
         register_facet ForemanPasswordstate::PasswordstateFacet, :passwordstate_facet
-        parameter_filter Host::Managed, passwordstate_facet_attributes: %i[passwordstate_server_id]
+        parameter_filter Host::Managed, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
       end
     end
 
+    # Precompile any JS or CSS files under app/assets/
+    # If requiring files from each other, list them explicitly here to avoid precompiling the same
+    # content twice.
     assets_to_precompile =
       Dir.chdir(root) do
-        Dir['app/assets/javascripts/**/*'].map do |f|
-          f.split(File::SEPARATOR, 4).last
+        Dir['app/assets/javascripts/**/*', 'app/assets/stylesheets/**/*'].map do |f|
+          f.split(File::SEPARATOR, 4).last.gsub(/\.scss\Z/, '')
         end
       end
-
     initializer 'foreman_passwordstate.assets.precompile' do |app|
       app.config.assets.precompile += assets_to_precompile
     end
-
     initializer 'foreman_passwordstate.configure_assets', group: :assets do
       SETTINGS[:foreman_passwordstate] = { assets: { precompile: assets_to_precompile } }
     end
@@ -46,7 +47,7 @@ module ForemanPasswordstate
     config.to_prepare do
       begin
         Host::Managed.send(:prepend, ForemanPasswordstate::HostManagedExtensions)
-        # HostsController.send(:prepend, ForemanPasswordstate::HostsControllerExtensions)
+        HostsController.send(:prepend, ForemanPasswordstate::HostsControllerExtensions)
       rescue StandardError => e
         Rails.logger.fatal "foreman_passwordstate: skipping engine hook (#{e})"
       end

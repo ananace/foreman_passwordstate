@@ -11,6 +11,9 @@ module ForemanPasswordstate
                 foreign_key: :host_id,
                 inverse_of: :host,
                 dependent: :destroy
+
+        before_destroy :remove_passwordstate_passwords!
+        after_update :remove_passwordstate_passwords_if_disabled
       end
     end
 
@@ -58,7 +61,18 @@ module ForemanPasswordstate
     def root_pass
       return super unless passwordstate_facet
 
+      return 'PlaceholderDuringCreation' unless persisted?
+
       host_pass('root', password_hash: operatingsystem&.password_hash)
+    end
+
+    def remove_passwordstate_passwords!
+      return unless passwordstate_facet
+
+      passwordstate_password_list.passwords.search(title: "@#{name}").each(&:delete)
+      true
+    rescue Passwordstate::NotFoundError => e
+      true
     end
   end
 end

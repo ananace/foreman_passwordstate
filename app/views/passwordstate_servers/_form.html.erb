@@ -2,10 +2,10 @@
   <%= base_errors_for @passwordstate_server %>
   <ul class="nav nav-tabs" data-tabs="tabs">
     <li class="active"><a href="#primary" data-toggle="tab"><%= _('Server') %></a></li>
-    <% if show_location_tab? %>
+    <% if show_location_tab? && false %>
       <li><a href="#locations" data-toggle="tab"><%= _('Locations') %></a></li>
     <% end %>
-    <% if show_organization_tab? %>
+    <% if show_organization_tab? && false %>
       <li><a href="#organizations" data-toggle="tab"><%= _('Organizations') %></a></li>
     <% end %>
   </ul>
@@ -15,24 +15,21 @@
       <%= text_f f, :name %>
       <%= text_f f, :url, placeholder: 'https://passwordstate.example.com' %>
       <%= textarea_f f, :description, :rows => 3 %>
-      <%= field f, :api_type, label: _('Authorization Method'), required: true, size: 'col-md-10' do
-        [
-          radio_button_f(f, :api_type, value: :winapi, text: 'Username + Password'),
-          radio_button_f(f, :api_type, value: :api, text: 'API Key')
-        ].join(' ').html_safe
-      end %>
+      <%= selectable_f f, :api_type, [['Username + Password', :winapi],['API Key', :api]], { selected: @passwordstate_server.api_type }, label: _('Authorization Method'), required: true, size: 'col-md-4' %>
+      <%= hidden_field_tag :redirect, params[:redirect] %>
 
-      <div id="winapi">
+      <fieldset id="passwordstate_winapi" class="authorization_form" style="display: none;">
         <%= text_f f, :user, required: true %>
         <%= password_f f, :password, required: true %>
-      </div>
-      <div id="api">
-        <%= password_f f, :password, required: true %>
-      </div>
+      </fieldset>
+      <fieldset id="passwordstate_api" class="authorization_form" style="display: none;">
+        <%= password_f f, :password, label: _('API Key'), required: true %>
+        <%= text_f f, :user, label: _('Password List ID'), required: true %>
+      </fieldset>
 
-      <%= link_to_function _("Test Connection"), "testConnection(this)", :class => "btn #{@passwordstate_server.test_connection.is_a?(FalseClass) ? "btn-default" : "btn-success"}", :'data-url' => test_connection_passwordstate_servers_path %>
+      <%= link_to_function _("Test Connection"), "testConnection(this)", id: 'test_connection_button', class: "btn #{@passwordstate_server.test_connection.is_a?(FalseClass) ? "btn-default" : "btn-success"}", :'data-url' => test_connection_passwordstate_servers_path %>
     </div>
-    <%#= render 'taxonomies/loc_org_tabs', :f => f, :obj => @wds_server %>
+    <%#= render 'taxonomies/loc_org_tabs', :f => f, :obj => @passwordstate_server %>
   </div>
 
   <%= submit_or_cancel f %>

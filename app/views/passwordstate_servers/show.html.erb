@@ -31,7 +31,7 @@
         </tr>
         <tr>
           <td><%= _('Version') %></td>
-          <td><%= @passwordstate_server.version %></td>
+          <td><%= @passwordstate_server.version rescue 'N/A' %></td>
         </tr>
       </tbody>
     </table>
@@ -46,7 +46,14 @@
         </tr>
       </thead>
       <tbody>
-      <%- @passwordstate_server.folders.each do |folder| -%>
+        <%-
+          begin
+            #@passwordstate_server.folders
+            []
+          rescue
+            []
+          end.each do |folder|
+        -%>
         <tr>
           <td><%= folder.folder_name %></td>
           <td><%= folder.full_path(true) %></td>

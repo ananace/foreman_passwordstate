@@ -12,6 +12,7 @@ module ForemanPasswordstate
 
     def password_list
       return nil unless password_list_id
+
       passwordstate_server.password_lists.get(password_list_id)
     end
   end

@@ -11,12 +11,12 @@ Deface::Override.new(virtual_path: 'hosts/_operating_system',
 # Hostgroup facets are not implemented at the moment
 if Hostgroup.instance_methods.include? :build_passwordstate_facet
   Deface::Override.new(virtual_path:  'hostgroups/_form',
-                       name:          'add_passwordstate_server_selection',
+                       name:          'hg_add_passwordstate_server_selection',
                        insert_bottom: '#primary',
                        partial:       'foreman_passwordstate/host_server_selection')
 
   Deface::Override.new(virtual_path:  'hostgroups/_form',
-                       name:          'add_passwordstate_password_choice',
+                       name:          'hg_add_passwordstate_password_choice',
                        insert_bottom: '#os',
                        partial:       'foreman_passwordstate/host_password_choice')
 end

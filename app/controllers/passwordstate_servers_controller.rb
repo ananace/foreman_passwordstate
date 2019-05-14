@@ -50,8 +50,11 @@ class PasswordstateServersController < ::ApplicationController
       @passwordstate_server = PasswordstateServer.new(passwordstate_server_params)
     end
 
-    @passwordstate_server.test_connection
-    render partial: 'form', locals: { passwordstate_server: @passwordstate_server }
+    if @passwordstate_server.test_connection
+      head 200
+    else
+      head 422
+    end
   end
 
   def folders

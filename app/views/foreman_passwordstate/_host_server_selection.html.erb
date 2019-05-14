@@ -2,6 +2,8 @@
   item = @hostgroup || @host
 -%>
 
+<%= javascript 'foreman_passwordstate/host_extensions.js' %>
+
 <%= fields_for item do |f| %>
 <%= f.fields_for 'passwordstate_facet_attributes' do |f| %>
   <%-
@@ -14,7 +16,12 @@
     { include_blank: true, selected: server&.id },
     { disabled: servers.empty?,
       help_inline: :indicator,
-      label: _('Passwordstate Server')
+      label: _('Passwordstate Server'),
+      label_help: _("<b>NB</b>: Selecting a Passwordstate server will replace ALL password handling<br/>Resetting this option will clear ALL passwords"),
+      label_help_options: { data: { placement: 'top' } },
+      onchange: 'update_passwordstate_server(this);',
+      'data-url': passwordstate_server_selected_hosts_path,
+      'data-type': controller_name.singularize
     }
   %>
 <% end -%>
