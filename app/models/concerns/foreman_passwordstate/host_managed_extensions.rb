@@ -13,7 +13,7 @@ module ForemanPasswordstate
                 dependent: :destroy
 
         before_destroy :remove_passwordstate_passwords!
-        after_update :remove_passwordstate_passwords_if_disabled
+        # after_update :ensure_passwordstate_passwords
       end
     end
 
@@ -28,10 +28,11 @@ module ForemanPasswordstate
       # TODO: If Hosts enabled
       # pw = list.search(host_name: name, user_name: 'root')
 
+      pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{id}:#{passwordstate_server.id}/foreman"
       begin
-        list.passwords.search(params.merge(title: "#{username}@#{fqdn}", user_name: username)).first
+        list.passwords.search(params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username)).first
       rescue Passwordstate::NotFoundError => e
-        return list.passwords.create params.merge(title: "#{username}@#{fqdn}", user_name: username, generate_password: true) if create
+        return list.passwords.create params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true) if create
 
         raise e
       end
@@ -70,7 +71,7 @@ module ForemanPasswordstate
     def remove_passwordstate_passwords!
       return unless passwordstate_facet
 
-      passwordstate_password_list.passwords.search(title: "@#{name}").each(&:delete)
+      passwordstate_password_list.passwords.search(description: "#{id}:#{passwordstate_server.id}/foreman").each(&:delete)
       true
     rescue Passwordstate::NotFoundError
       true
