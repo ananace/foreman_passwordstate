@@ -63,7 +63,8 @@ module ForemanPasswordstate
 
       return 'PlaceholderDuringCreation' unless persisted?
 
-      host_pass('root', password_hash: operatingsystem&.password_hash)
+      root_user = operatingsystem&.root_user || 'root'
+      host_pass(root_user, password_hash: operatingsystem&.password_hash)
     end
 
     def remove_passwordstate_passwords!
