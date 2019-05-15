@@ -29,9 +29,9 @@ module ForemanPasswordstate
       # pw = list.search(host_name: name, user_name: 'root')
 
       begin
-        list.passwords.search(params.merge(title: "#{username}@#{name}", user_name: username)).first
+        list.passwords.search(params.merge(title: "#{username}@#{fqdn}", user_name: username)).first
       rescue Passwordstate::NotFoundError => e
-        return list.passwords.create params.merge(title: "#{username}@#{name}", user_name: username, generate_password: true) if create
+        return list.passwords.create params.merge(title: "#{username}@#{fqdn}", user_name: username, generate_password: true) if create
 
         raise e
       end
@@ -61,7 +61,7 @@ module ForemanPasswordstate
     def root_pass
       return super unless passwordstate_facet
 
-      return 'PlaceholderDuringCreation' unless persisted?
+      return 'PlaceholderDuringCreation' if !persisted? || domain.nil?
 
       root_user = operatingsystem&.root_user || 'root'
       host_pass(root_user, password_hash: operatingsystem&.password_hash)
