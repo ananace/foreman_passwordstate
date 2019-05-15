@@ -72,7 +72,7 @@ module ForemanPasswordstate
 
       passwordstate_password_list.passwords.search(title: "@#{name}").each(&:delete)
       true
-    rescue Passwordstate::NotFoundError => e
+    rescue Passwordstate::NotFoundError
       true
     end
   end
