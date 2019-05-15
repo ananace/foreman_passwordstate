@@ -9,6 +9,7 @@ module ForemanPasswordstate
     validates_lengths_from_database
 
     validates :host, presence: true, allow_blank: false
+    validates :passwordstate_server, presence: true, allow_blank: false
 
     def password_list
       return nil unless password_list_id
