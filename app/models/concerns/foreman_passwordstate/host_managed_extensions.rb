@@ -76,5 +76,13 @@ module ForemanPasswordstate
     rescue Passwordstate::NotFoundError
       true
     end
+
+    # Skip encrypting the root password if it's read from passwords
+    def crypt_root_pass
+      return if passwordstate_facet
+
+      super
+    end
+
   end
 end
