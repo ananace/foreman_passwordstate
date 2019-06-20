@@ -28,9 +28,10 @@ module ForemanPasswordstate
       # TODO: If Hosts enabled
       # pw = list.search(host_name: name, user_name: 'root')
 
-      pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{id}:#{passwordstate_server.id}/foreman"
+      stable_pw_desc = "#{id}:#{passwordstate_server.id}/foreman"
+      pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{stable_pw_desc}"
       begin
-        list.passwords.search(params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username)).first
+        list.passwords.search(params.merge(description: stable_pw_desc, user_name: username)).first
       rescue Passwordstate::NotFoundError => e
         return list.passwords.create params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true) if create
 
