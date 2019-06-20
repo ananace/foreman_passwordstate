@@ -20,6 +20,21 @@ module ForemanPasswordstate
     delegate :passwordstate_server, to: :passwordstate_facet
     delegate :password_list, to: :passwordstate_facet, prefix: :passwordstate
 
+    # FIXME
+    def serializable_hash(options = nil)
+      return super unless passwordstate_facet
+      return super unless caller.include? "/usr/share/foreman/app/controllers/api/v2/hosts_controller.rb:289:in `facts'"
+
+      # Skip writing root_pass in the serialized object
+      options ||= {}
+      if !options[:only]
+        options[:except] ||= []
+        options[:except] << :root_pass
+      end
+
+      super options
+    end
+
     def password_entry(username, create: true, **params)
       return nil unless passwordstate_facet
 
