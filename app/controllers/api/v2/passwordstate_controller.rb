@@ -15,7 +15,7 @@ module Api
 
       api :GET, '/passwordstate/:user', N_('Acquire a Passwordstate password')
       param_group :passwordstate
-      param :create, Boolean, required: false, desc: N_('Should the password be created if it does not exist')
+      param :create, :bool, required: false, desc: N_('Should the password be created if it does not exist')
       param :hash, String, required: false, desc: N_('The hash algorithm to use on the password')
 
       def acquire
