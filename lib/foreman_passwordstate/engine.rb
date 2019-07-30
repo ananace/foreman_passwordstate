@@ -23,8 +23,13 @@ module ForemanPasswordstate
              caption: N_('Passwordstate Servers'),
              parent: :infrastructure_menu
 
-        register_facet ForemanPasswordstate::PasswordstateFacet, :passwordstate_facet
+        register_facet ForemanPasswordstate::PasswordstateFacet, :passwordstate_facet do
+          configure_host
+          configure_hostgroup
+        end
+
         parameter_filter Host::Managed, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
+        parameter_filter Hostgroup, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
       end
     end
 
@@ -47,7 +52,9 @@ module ForemanPasswordstate
     config.to_prepare do
       begin
         Host::Managed.send(:prepend, ForemanPasswordstate::HostManagedExtensions)
+        Hostgroup.send(:prepend, ForemanPasswordstate::HostgroupExtensions)
         HostsController.send(:prepend, ForemanPasswordstate::HostsControllerExtensions)
+        HostgroupsController.send(:prepend, ForemanPasswordstate::HostgroupsControllerExtensions)
         Operatingsystem.send(:prepend, ForemanPasswordstate::OperatingsystemExtensions)
       rescue StandardError => e
         Rails.logger.fatal "foreman_passwordstate: skipping engine hook (#{e})"

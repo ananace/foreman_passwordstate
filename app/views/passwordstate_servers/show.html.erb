@@ -67,16 +67,16 @@
     <table class="<%= table_css_classes 'table-fixed' %>">
       <thead>
         <tr>
-          <th class="col-md-1"><%= _('Name') %></th>
-          <th class="col-md-2"><%= _('Full Path') %></th>
-          <th class="col-md-9"><%= _('Description') %></th>
+          <th class="col-md-2"><%= _('Name') %></th>
+          <th class="col-md-3"><%= _('Full Path') %></th>
+          <th class="col-md-7"><%= _('Description') %></th>
         </tr>
       </thead>
       <tbody>
       <%- @passwordstate_server.password_lists.each do |list| -%>
         <tr>
           <td><%= list.password_list %></td>
-          <td><%= list.full_path(true) %></td>
+          <td><a href="<%= @passwordstate_server.get_list_url(list)  %>" target="_blank"><%= list.full_path(true) %></a></td>
           <td><%= list.description %></td>
         </tr>
       <%- end -%>

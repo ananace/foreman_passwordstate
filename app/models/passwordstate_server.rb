@@ -14,7 +14,7 @@ class PasswordstateServer < ApplicationRecord
   before_destroy EnsureNotUsedBy.new :hosts
   has_many :passwordstate_facets,
            class_name: '::ForemanPasswordstate::PasswordstateFacet',
-           dependent: :nullify,
+           dependent: :destroy,
            inverse_of: :passwordstate_server
 
   has_many :hosts,
@@ -63,6 +63,10 @@ class PasswordstateServer < ApplicationRecord
       end
       CODE
     end
+  end
+
+  def get_list_url(pwlist)
+    client.server_url.dup.tap { |u| u.query = "plid=#{pwlist.password_list_id}" }
   end
 
   private

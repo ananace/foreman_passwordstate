@@ -1,5 +1,6 @@
 <%-
-  item = @hostgroup || @host
+  item = controller_name == 'hosts' ? @host : @hostgroup
+  facet = @host.try(:passwordstate_facet) rescue nil || @hostgroup.try(:passwordstate_facet) rescue nil
 -%>
 
 <%= javascript 'foreman_passwordstate/host_extensions.js' %>
@@ -10,7 +11,7 @@
     servers = PasswordstateServer.all.map do |server|
       [ server.id, "#{server.name} - #{server.url}" ]
     end
-    server = item.try(:passwordstate_server) rescue nil
+    server = facet.try :passwordstate_server rescue nil
   -%>
   <%= select_f f, :passwordstate_server_id, servers, :first, :last,
     { include_blank: true, selected: server&.id },
@@ -20,7 +21,7 @@
       label_help: _("<b>NB</b>: Selecting a Passwordstate server will replace ALL password handling<br/>Resetting this option will clear ALL passwords"),
       label_help_options: { data: { placement: 'top' } },
       onchange: 'update_passwordstate_server(this);',
-      'data-url': passwordstate_server_selected_hosts_path,
+      'data-url': url_for(action: :passwordstate_server_selected, only_path: true),
       'data-type': controller_name.singularize
     }
   %>

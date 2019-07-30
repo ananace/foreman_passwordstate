@@ -1,5 +1,16 @@
+var PASSWORD_LIST_ID=""
 $(function() {
-  update_passwordstate_list($('#host_passwordstate_facet_attributes_password_list_id'));
+  if ($('#host_passwordstate_facet_attributes_password_list_id').length != 0) {
+    PASSWORD_LIST_ID = '#host_passwordstate_facet_attributes_password_list_id'
+  } else {
+    PASSWORD_LIST_ID = '#hostgroup_passwordstate_facet_attributes_password_list_id'
+  }
+
+  update_passwordstate_list($(PASSWORD_LIST_ID));
+
+  $(document.body).on('ContentLoad', function() {
+    update_passwordstate_list($(PASSWORD_LIST_ID));
+  });
 });
 
 function update_passwordstate_server(element) {
@@ -19,7 +30,7 @@ function update_passwordstate_server(element) {
     success: function(response) {
       data = $(response);
       $('#passwordstate_list_select').html(data.html());
-      update_passwordstate_list($('#host_passwordstate_facet_attributes_password_list_id'));
+      update_passwordstate_list($(PASSWORD_LIST_ID));
     }
   });
 }
