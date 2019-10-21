@@ -12,8 +12,12 @@ class PasswordstateServer < ApplicationRecord
   audited except: %i[password]
 
   before_destroy EnsureNotUsedBy.new :hosts
-  has_many :passwordstate_facets,
-           class_name: '::ForemanPasswordstate::PasswordstateFacet',
+  has_many :passwordstate_host_facets,
+           class_name: '::ForemanPasswordstate::PasswordstateHostFacet',
+           dependent: :destroy,
+           inverse_of: :passwordstate_server
+  has_many :passwordstate_hostgroup_facets,
+           class_name: '::ForemanPasswordstate::PasswordstateHostgroupFacet',
            dependent: :destroy,
            inverse_of: :passwordstate_server
 
@@ -21,7 +25,12 @@ class PasswordstateServer < ApplicationRecord
            class_name: '::Host::Managed',
            dependent: :nullify,
            inverse_of: :passwordstate_server,
-           through: :passwordstate_facets
+           through: :passwordstate_host_facets
+  has_many :hostgroups,
+           class_name: '::Hostgroup',
+           dependent: :nullify,
+           inverse_of: :passwordstate_server,
+           through: :passwordstate_hostgroup_facets
 
   validates :name, presence: true, uniqueness: true
   validates :url, presence: true
