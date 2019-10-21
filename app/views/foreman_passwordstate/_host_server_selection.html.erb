@@ -1,6 +1,6 @@
 <%-
   item = controller_name == 'hosts' ? @host : @hostgroup
-  facet = @host.try(:passwordstate_facet) rescue nil || @hostgroup.try(:passwordstate_facet) rescue nil
+  facet = item.try(:passwordstate_facet)
 -%>
 
 <%= javascript 'foreman_passwordstate/host_extensions.js' %>
