@@ -4,7 +4,7 @@ module ForemanPasswordstate
 
     belongs_to :passwordstate_server,
                class_name: '::PasswordstateServer',
-               inverse_of: :passwordstate_facets
+               inverse_of: :passwordstate_hostgroup_facets
 
     validates_lengths_from_database
 
