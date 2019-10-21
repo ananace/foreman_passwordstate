@@ -7,7 +7,7 @@ module ForemanPasswordstate
         # before_provision :remove_passwordstate_host
 
         has_one :passwordstate_facet,
-                class_name: '::ForemanPasswordstate::PasswordstateFacet',
+                class_name: '::ForemanPasswordstate::PasswordstateHostFacet',
                 foreign_key: :host_id,
                 inverse_of: :host,
                 dependent: :destroy

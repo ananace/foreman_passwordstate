@@ -3,7 +3,9 @@ module ForemanPasswordstate
     def self.prepended(base)
       base.class_eval do
         has_one :passwordstate_facet,
-                class_name: '::ForemanPasswordstate::PasswordstateFacet',
+                class_name: '::ForemanPasswordstate::PasswordstateHostgroupFacet',
+                foreign_key: :hostgroup_id,
+                inverse_of: :hostgroup,
                 dependent: :destroy
       end
     end
