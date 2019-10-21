@@ -54,6 +54,14 @@ module ForemanPasswordstate
       end
     end
 
+    def passwordstate_passwords
+      return nil unless passwordstate_facet
+
+      stable_pw_desc = "#{id}:#{passwordstate_server.id}/foreman"
+      passwordstate_password_list.passwords.search(description: "#{id}:#{passwordstate_server.id}/foreman", exclude_password: true)
+    end
+
+
     def host_pass(username, password_hash: 'SHA256', create: true, **params)
       return nil unless passwordstate_facet
 
@@ -87,7 +95,7 @@ module ForemanPasswordstate
     def remove_passwordstate_passwords!
       return unless passwordstate_facet
 
-      passwordstate_password_list.passwords.search(description: "#{id}:#{passwordstate_server.id}/foreman").each(&:delete)
+      passwordstate_passwords.each(&:delete)
       true
     rescue Passwordstate::NotFoundError
       true
