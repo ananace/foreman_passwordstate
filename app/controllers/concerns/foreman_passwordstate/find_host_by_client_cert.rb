@@ -1,4 +1,4 @@
-module ForemanDlm
+module ForemanPasswordstate
   module FindHostByClientCert
     extend ActiveSupport::Concern
 
