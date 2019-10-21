@@ -12,7 +12,7 @@ module ForemanPasswordstate
     validates :passwordstate_server, presence: true, allow_blank: false
 
     # inherit_attributes :passwordstate_server_id, :password_list_id
-    def attributes_to_inherit
+    def self.attributes_to_inherit
       %w[passwordstate_server_id password_list_id]
     end
 
