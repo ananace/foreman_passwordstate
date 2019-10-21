@@ -1,7 +1,6 @@
 module ForemanPasswordstate
   class PasswordstateHostgroupFacet < ApplicationRecord
     include Facets::HostgroupFacet
-    include Facets::Base
 
     belongs_to :passwordstate_server,
                class_name: '::PasswordstateServer',
