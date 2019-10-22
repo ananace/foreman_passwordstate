@@ -16,10 +16,10 @@ module ForemanPasswordstate
       %w[passwordstate_server_id password_list_id]
     end
 
-    def password_list
+    def password_list(**query)
       return nil unless password_list_id
 
-      passwordstate_server.password_lists.get(password_list_id)
+      passwordstate_server.password_lists.get(password_list_id, query)
     end
   end
 end

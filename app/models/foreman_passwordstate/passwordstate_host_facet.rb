@@ -11,10 +11,10 @@ module ForemanPasswordstate
     validates :host, presence: true, allow_blank: false
     validates :passwordstate_server, presence: true, allow_blank: false
 
-    def password_list
+    def password_list(**query)
       return nil unless password_list_id
 
-      passwordstate_server.password_lists.get(password_list_id)
+      passwordstate_server.password_lists.get(password_list_id, query)
     end
   end
 end

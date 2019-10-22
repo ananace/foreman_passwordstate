@@ -38,7 +38,7 @@ module ForemanPasswordstate
     def password_entry(username, create: true, **params)
       return nil unless passwordstate_facet
 
-      list = passwordstate_password_list
+      list = passwordstate_password_list(_bare: true)
 
       # TODO: If Hosts enabled
       # pw = list.search(host_name: name, user_name: 'root')
@@ -58,7 +58,7 @@ module ForemanPasswordstate
       return nil unless passwordstate_facet
 
       stable_pw_desc = "#{id}:#{passwordstate_server.id}/foreman"
-      passwordstate_password_list.passwords.search(description: "#{id}:#{passwordstate_server.id}/foreman", exclude_password: true)
+      passwordstate_password_list(_bare: true).passwords.search(description: "#{id}:#{passwordstate_server.id}/foreman", exclude_password: true)
     end
 
 
