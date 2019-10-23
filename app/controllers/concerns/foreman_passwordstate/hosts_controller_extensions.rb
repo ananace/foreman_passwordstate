@@ -17,6 +17,24 @@ module ForemanPasswordstate
 
       render partial: 'foreman_passwordstate/host_password_choice', locals: { item: passwordstate_facet }
     end
+
+    def passwordstate_passwords
+      find_resource
+      render partial: 'foreman_passwordstate/passwords_tab_pane_content'
+    rescue ActionView::Template::Error => exception
+      process_ajax_error exception, 'fetch managed passwords'
+    end
+
+    private
+
+    def action_permission
+      case params[:action]
+      when 'passwordstate_passwords'
+        :view_hosts
+      else
+        super
+      end
+    end
   end
 end
 

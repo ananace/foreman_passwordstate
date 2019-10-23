@@ -24,6 +24,9 @@ Rails.application.routes.draw do
       collection do
         post 'passwordstate_server_selected'
       end
+      member do
+        get 'passwordstate_passwords'
+      end
     end
     resources :discovered_hosts, only: [] do
       collection do
