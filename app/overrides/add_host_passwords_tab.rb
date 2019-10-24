@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: Fix excessive queries first
-if false
 Deface::Override.new(:virtual_path => 'hosts/show',
                      :name => 'add_host_passwords_tab',
                      :insert_bottom => 'ul.nav-tabs',
@@ -11,4 +9,3 @@ Deface::Override.new(:virtual_path => 'hosts/show',
                      :name => 'add_host_passwords_tab_pane',
                      :insert_bottom => 'div.tab-content',
                      :partial => 'foreman_passwordstate/passwords_tab_pane')
-end
