@@ -3,7 +3,7 @@
   facet = item.try(:passwordstate_facet)
 -%>
 
-<%= javascript 'foreman_passwordstate/host_extensions.js' %>
+<%= javascript 'foreman_passwordstate/host_edit_extensions.js' %>
 
 <%= fields_for item do |f| %>
 <%= f.fields_for 'passwordstate_facet_attributes' do |f| %>
