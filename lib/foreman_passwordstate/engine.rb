@@ -25,7 +25,7 @@ module ForemanPasswordstate
 
         register_facet ForemanPasswordstate::PasswordstateHostFacet, :passwordstate_facet do
           configure_host do
-            extend_model ForemanPasswordstate::HostManagedExtensions
+            # extend_model ForemanPasswordstate::HostManagedExtensions # The #root_pass override fails if done here
             add_tabs passwordstate_facet: 'foreman_passwordstate/passwordstate_facets/passwordstate_facet'
           end
           configure_hostgroup ForemanPasswordstate::PasswordstateHostgroupFacet
@@ -54,7 +54,7 @@ module ForemanPasswordstate
 
     config.to_prepare do
       begin
-        # Host::Managed.send(:prepend, ForemanPasswordstate::HostManagedExtensions)
+        Host::Managed.send(:prepend, ForemanPasswordstate::HostManagedExtensions)
         Hostgroup.send(:prepend, ForemanPasswordstate::HostgroupExtensions)
         HostsController.send(:prepend, ForemanPasswordstate::HostsControllerExtensions)
         HostgroupsController.send(:prepend, ForemanPasswordstate::HostgroupsControllerExtensions)
