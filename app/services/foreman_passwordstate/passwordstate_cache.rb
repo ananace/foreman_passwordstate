@@ -18,22 +18,27 @@ module ForemanPasswordstate
 
       uncached_value = get_uncached_value(key, &block)
       write(key, uncached_value)
+
       uncached_value
     end
 
     def delete(key)
+      logger.debug("Deleting #{key} from passwordstate cache")
       Rails.cache.delete(cache_key + key.to_s)
     end
 
     def read(key)
+      logger.debug("Reading #{key} in passwordstate cache")
       Rails.cache.read(cache_key + key.to_s, cache_options)
     end
 
     def write(key, value)
+      logger.debug("Writing #{key} in passwordstate cache")
       Rails.cache.write(cache_key + key.to_s, value, cache_options)
     end
 
     def refresh
+      logger.debug('Refreshing passwordstate cache')
       Rails.cache.delete(cache_scope_key)
       true
     rescue StandardError => e

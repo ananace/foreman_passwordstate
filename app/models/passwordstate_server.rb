@@ -51,7 +51,7 @@ class PasswordstateServer < ApplicationRecord
   end
 
   def folders
-    cache.cache(:folders) do
+    data = cache.cache(:folders) do
       return client.folders.map(&:attributes) if api_type.to_sym == :winapi
 
       client.folders.tap do |folders|
@@ -61,17 +61,19 @@ class PasswordstateServer < ApplicationRecord
         end
         CODE
       end.map(&:attributes)
-    end.map { |attrs| client.folders.new attrs }
+    end
+    client.folders.load data.map { |d| client.folders.new d }
   end
 
   def hosts
-    cache.cache(:hosts) do
+    data = cache.cache(:hosts) do
       client.hosts.map(&:attributes)
-    end.map { |attrs| client.host.new attrs }
+    end
+    client.hosts.load data.map { |d| client.hosts.new d }
   end
 
   def password_lists
-    cache.cache(:password_lists) do
+    data = cache.cache(:password_lists) do
       return client.password_lists.map(&:attributes) if api_type.to_sym == :winapi
 
       # Only handle a single password list if using API keys
@@ -82,7 +84,8 @@ class PasswordstateServer < ApplicationRecord
         end
         CODE
       end.map(&:attributes)
-    end.map { |attrs| client.password_lists.new attrs }
+    end
+    client.password_lists.load data.map { |d| client.password_lists.new d }
   end
 
   def get_list_url(pwlist)
