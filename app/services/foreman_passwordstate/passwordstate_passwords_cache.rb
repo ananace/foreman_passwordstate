@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanPasswordstate
-  class PasswordstateCache
+  class PasswordstatePasswordsCache
     include Singleton
 
     # create a private instance of MemoryStore

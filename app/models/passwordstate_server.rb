@@ -1,4 +1,5 @@
 class PasswordstateServer < ApplicationRecord
+  include ForemanPasswordstate::PasswordstateCaching
   include Taxonomix
   include Encryptable
 
@@ -41,7 +42,7 @@ class PasswordstateServer < ApplicationRecord
   scoped_search on: :name
   default_scope -> { order('passwordstate_servers.name') }
 
-  delegate :version, :documents, :folders, :hosts, :passwords, :reporting, to: :client
+  delegate :version, :passwords, to: :client
 
   def test_connection(options = {})
     return false unless url
@@ -50,28 +51,38 @@ class PasswordstateServer < ApplicationRecord
   end
 
   def folders
-    return client.folders if api_type.to_sym == :winapi
+    cache.cache(:folders) do
+      return client.folders.map(&:attributes) if api_type.to_sym == :winapi
 
-    client.folders.tap do |folders|
-      folders.instance_eval <<-CODE, __FILE__, __LINE__ + 1
-      def lazy_load
-        load []
-      end
-      CODE
-    end
+      client.folders.tap do |folders|
+        folders.instance_eval <<-CODE, __FILE__, __LINE__ + 1
+        def lazy_load
+          load []
+        end
+        CODE
+      end.map(&:attributes)
+    end.map { |attrs| client.folders.new attrs }
+  end
+
+  def hosts
+    cache.cache(:hosts) do
+      client.hosts.map(&:attributes)
+    end.map { |attrs| client.host.new attrs }
   end
 
   def password_lists
-    return client.password_lists if api_type.to_sym == :winapi
+    cache.cache(:password_lists) do
+      return client.password_lists.map(&:attributes) if api_type.to_sym == :winapi
 
-    # Only handle a single password list if using API keys
-    client.password_lists.tap do |list|
-      list.instance_eval <<-CODE, __FILE__, __LINE__ + 1
-      def lazy_load
-        load [get(#{user})]
-      end
-      CODE
-    end
+      # Only handle a single password list if using API keys
+      client.password_lists.tap do |list|
+        list.instance_eval <<-CODE, __FILE__, __LINE__ + 1
+        def lazy_load
+          load [get(#{user})]
+        end
+        CODE
+      end.map(&:attributes)
+    end.map { |attrs| client.password_lists.new attrs }
   end
 
   def get_list_url(pwlist)

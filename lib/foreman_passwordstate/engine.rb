@@ -31,6 +31,8 @@ module ForemanPasswordstate
           configure_hostgroup ForemanPasswordstate::PasswordstateHostgroupFacet
         end
 
+        register_info_provider ForemanPasswordstate::HostInfoProvider
+
         parameter_filter Host::Managed, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
         parameter_filter Hostgroup, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
       end
