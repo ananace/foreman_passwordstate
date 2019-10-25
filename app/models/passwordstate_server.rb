@@ -80,7 +80,7 @@ class PasswordstateServer < ApplicationRecord
       client.password_lists.tap do |list|
         list.instance_eval <<-CODE, __FILE__, __LINE__ + 1
         def lazy_load
-          load [get(#{user})]
+          load [get(#{user}, { _force: true })]
         end
         CODE
       end.map(&:attributes)
