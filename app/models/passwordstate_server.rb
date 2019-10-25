@@ -89,7 +89,7 @@ class PasswordstateServer < ApplicationRecord
   end
 
   def get_list_url(pwlist)
-    client.server_url.dup.tap { |u| u.query = "plid=#{pwlist.password_list_id}" }
+    URI.join client.server_url, "plid=#{pwlist.password_list_id}"
   end
 
   private
