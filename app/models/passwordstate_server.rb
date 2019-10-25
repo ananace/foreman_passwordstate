@@ -92,6 +92,10 @@ class PasswordstateServer < ApplicationRecord
     URI.join client.server_url, "plid=#{pwlist.password_list_id}"
   end
 
+  def get_password_url(pw)
+    URI.join client.server_url, "pid=#{pw.password_id}"
+  end
+
   private
 
   def client
