@@ -12,6 +12,12 @@ module ForemanPasswordstate
                 inverse_of: :host,
                 dependent: :destroy
 
+        scoped_search on: :passwordstate_server_id,
+                      relation: :passwordstate_facet,
+                      rename: :passwordstate_server,
+                      complete_value: true,
+                      only_explicit: true
+
         before_destroy :remove_passwordstate_passwords!
         # after_update :ensure_passwordstate_passwords
       end
