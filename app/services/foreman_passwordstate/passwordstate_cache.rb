@@ -11,8 +11,8 @@ module ForemanPasswordstate
       self.cache_duration = cache_duration
     end
 
-    def cache(key, &block)
-      cached_value = read(key)
+    def cache(key, **options, &block)
+      cached_value = read(key, **options)
       return cached_value if cached_value
       return unless block_given?
 
@@ -27,9 +27,9 @@ module ForemanPasswordstate
       Rails.cache.delete(cache_key + key.to_s)
     end
 
-    def read(key)
+    def read(key, **options)
       logger.debug("Reading #{key} in passwordstate cache")
-      Rails.cache.read(cache_key + key.to_s, cache_options)
+      Rails.cache.read(cache_key + key.to_s, cache_options.merge(options))
     end
 
     def write(key, value)

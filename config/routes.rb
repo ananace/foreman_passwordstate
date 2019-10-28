@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  namespace :api, defaults: { format: :json } do
+    scope '(:apiv)', module: :v2,
+                     defaults: { apiv: 'v2' },
+                     apiv: /v1|v2/,
+                     constraints: ApiConstraints.new(version: 2) do
+      get 'passwords/:user', to: 'passwords#acquire'
+      post 'passwords/:user', to: 'passwords#release'
+    end
+  end
+
   scope '/foreman_passwordstate' do
     constraints(id: %r{[^\/]+}) do
       resources :passwordstate_servers do
@@ -25,7 +35,7 @@ Rails.application.routes.draw do
         post 'passwordstate_server_selected'
       end
       member do
-        get 'passwordstate_passwords'
+        get 'passwordstate_passwords_tab_selected'
       end
     end
     resources :discovered_hosts, only: [] do

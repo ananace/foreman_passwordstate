@@ -1,5 +1,13 @@
 module ForemanPasswordstate
   module HostsControllerExtensions
+    def self.prepended(base)
+      base.class_eval do
+        before_action :find_resource_with_passwordstate, only: %i[passwordstate_passwords_tab_selected]
+
+        alias_method :find_resource_with_passwordstate, :find_resource
+      end
+    end
+
     def update
       super
 
@@ -18,8 +26,7 @@ module ForemanPasswordstate
       render partial: 'foreman_passwordstate/host_password_choice', locals: { item: passwordstate_facet }
     end
 
-    def passwordstate_passwords
-      find_resource
+    def passwordstate_passwords_tab_selected
       render partial: 'foreman_passwordstate/passwords_tab_pane_content'
     rescue ActionView::Template::Error => exception
       process_ajax_error exception, 'fetch managed passwords'
@@ -29,8 +36,10 @@ module ForemanPasswordstate
 
     def action_permission
       case params[:action]
-      when 'passwordstate_passwords'
-        :view_hosts
+      when 'passwordstate_passwords_tab_selected'
+        :view
+      when 'passwordstate_server_selected'
+        :edit
       else
         super
       end

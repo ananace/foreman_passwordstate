@@ -17,6 +17,46 @@ module ForemanPasswordstate
       Foreman::Plugin.register :foreman_passwordstate do
         requires_foreman '>= 1.16'
 
+        apipie_documented_controllers ["#{ForemanPasswordstate::Engine.root}/app/controllers/api/v2/*.rb"]
+
+        security_block :foreman_passwordstate do
+          permission :view_passwordstate_servers, {
+            :'passwordstate_servers' => %i[index show],
+          }, resource_type: 'PasswordstateServer'
+
+          permission :create_passwordstate_servers, {
+            :'passwordstate_servers' => %i[new],
+          }, resource_type: 'PasswordstateServer'
+
+          permission :edit_passwordstate_servers, {
+            :'passwordstate_servers' => %i[edit],
+          }, resource_type: 'PasswordstateServer'
+
+          permission :delete_passwordstate_servers, {
+            :'passwordstate_servers' => %i[destroy],
+          }, resource_type: 'PasswordstateServer'
+
+          permission :full_passwordstate_password_access, {
+            :'api/v2/passwords' => %i[acquire release]
+          }
+
+          # permission :view_hosts,
+          #   { hosts: %i[passwordstate_passwords_tab_selected] },
+          #   resource_type: 'Host'
+        end
+
+        Foreman::AccessControl.permission(:view_hosts).actions.concat %w[
+          hosts/passwordstate_passwords_tab_selected
+        ]
+
+        role 'Passwordstate server viewer', %i[view_passwordstate_servers]
+        role 'Passwordstate server manager', %i[view_passwordstate_servers create_passwordstate_servers edit_passwordstate_servers delete_passwordstate_servers ]
+
+        # Only meant for a puppetmaster user, to retrieve passwords into the catalog
+        role 'Password manager', %i[full_passwordstate_password_access]
+
+        add_all_permissions_to_default_roles
+
         # add menu entry
         menu :top_menu, :passwordstate_servers,
              url_hash: { controller: :passwordstate_servers, action: :index },
