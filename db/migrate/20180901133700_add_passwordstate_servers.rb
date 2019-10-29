@@ -13,25 +13,21 @@ class AddPasswordstateServers < ActiveRecord::Migration[5.1]
     end
 
     create_table :passwordstate_host_facets do |t|
-      t.references :passwordstate_server, null: false, foreign_key: true, index: { name: :idx_pwstate_host_by_pwstate_server }
-      t.integer :host_id, null: false, index: true
+      t.references :passwordstate_server, null: true, index: false, foreign_key: true
+      t.integer :host_id, null: false, index: true, unique: true
 
-      t.integer :password_list_id, null: false
+      t.integer :password_list_id, null: true
 
       t.timestamps null: false
     end
-
-    add_index :passwordstate_host_facets, [:host_id, :passwordstate_server_id], name: 'idx_pwstate_host', unique: true
 
     create_table :passwordstate_hostgroup_facets do |t|
-      t.references :passwordstate_server, null: false, foreign_key: true, index: { name: :idx_pwstate_hostgroup_by_pwstate_server }
-      t.integer :hostgroup_id, null: false, index: true
+      t.references :passwordstate_server, null: true, index: false, foreign_key: true
+      t.integer :hostgroup_id, null: false, index: true, unique: true
 
-      t.integer :password_list_id, null: false
+      t.integer :password_list_id, null: true
 
       t.timestamps null: false
     end
-
-    add_index :passwordstate_hostgroup_facets, [:hostgroup_id, :passwordstate_server_id], name: 'idx_pwstate_hostgroup', unique: true
   end
 end
