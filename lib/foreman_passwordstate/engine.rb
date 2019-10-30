@@ -25,7 +25,7 @@ module ForemanPasswordstate
           }, resource_type: 'PasswordstateServer'
 
           permission :create_passwordstate_servers, {
-            :'passwordstate_servers' => %i[new],
+            :'passwordstate_servers' => %i[new create],
           }, resource_type: 'PasswordstateServer'
 
           permission :edit_passwordstate_servers, {
