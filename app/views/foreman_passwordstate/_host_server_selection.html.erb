@@ -2,12 +2,13 @@
   item = controller_name == 'hosts' ? @host : @hostgroup
   facet = item.try(:passwordstate_facet)
 
-  hostgroup = @hostgroup || @host.hostgroup
-  inherited = facet.nil?
-  inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])&.any?
-  inherited = false if persisted? && facet.nil?
+  if !(item.persisted? rescue false)
+    hostgroup = @hostgroup || @host.hostgroup
+    inherited = facet.nil?
+    inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])&.any?
 
-  facet ||= item.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])) if inherited && hostgroup
+    facet ||= item.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])) if inherited && hostgroup
+  end
 -%>
 
 <%= javascript 'foreman_passwordstate/host_edit_extensions.js' %>
