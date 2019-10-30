@@ -1,6 +1,12 @@
 <%-
   item = controller_name == 'hosts' ? @host : @hostgroup
   facet = item.try(:passwordstate_facet)
+
+  hostgroup = @hostgroup || @host.hostgroup
+  inherited = facet.nil?
+  inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])&.any?
+
+  facet ||= item.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])) if inherited && hostgroup
 -%>
 
 <%= javascript 'foreman_passwordstate/host_edit_extensions.js' %>
@@ -11,10 +17,14 @@
     servers = PasswordstateServer.all.map do |server|
       [ server.id, "#{server.name} - #{server.url}" ]
     end
-    server = facet.try :passwordstate_server rescue nil
+    server_id = facet.try :passwordstate_server_id rescue nil
   -%>
   <%= select_f f, :passwordstate_server_id, servers, :first, :last,
-    { include_blank: true, selected: server&.id },
+    { include_blank: true,
+      selected: server_id,
+      # disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+      # disable_button_enabled: inherited,
+    },
     { disabled: servers.empty?,
       help_inline: :indicator,
       label: _('Passwordstate Server'),
