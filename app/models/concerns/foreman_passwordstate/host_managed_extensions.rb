@@ -26,6 +26,28 @@ module ForemanPasswordstate
     delegate :passwordstate_server, to: :passwordstate_facet
     delegate :password_list, to: :passwordstate_facet, prefix: :passwordstate
 
+    def ensure_passwordstate_facet(force_inherit: false, **attrs)
+      return passwordstate_facet if passwordstate_facet && attrs.empty? && !force_inherit
+
+      if force_inherit
+        attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet]).merge(attrs) if hostgroup
+        attrs = passwordstate_facet.attributes.merge(attrs) if passwordstate_facet
+      else
+        attrs = passwordstate_facet.attributes.merge(attrs) if passwordstate_facet
+        attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet]).merge(attrs) if hostgroup
+      end
+
+      if passwordstate_facet
+        f = passwordstate_facet
+        f.update_attributes attrs
+      else
+        f = build_passwordstate_facet attrs
+      end
+      f.save if persisted?
+
+      f
+    end
+
     # FIXME
     def serializable_hash(options = nil)
       return super unless passwordstate_facet
