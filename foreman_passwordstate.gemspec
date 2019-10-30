@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/ananace/foreman_passwordstate'
   spec.license       = 'MIT'
 
-  spec.files         = Dir['{app,conig,db,lib,locale}/**/*'] + %w[LICENSE.txt Rakefile README.md]
+  spec.files         = Dir['{app,config,db,lib,locale}/**/*'] + %w[LICENSE.txt Rakefile README.md]
   spec.test_files    = Dir['test/**/*']
 
   spec.add_dependency 'deface', '< 2.0'
