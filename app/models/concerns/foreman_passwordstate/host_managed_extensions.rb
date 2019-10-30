@@ -123,6 +123,8 @@ module ForemanPasswordstate
     def remove_passwordstate_passwords!
       return unless passwordstate_facet
 
+      logger.info "Removing Passwordstate passwords..."
+
       passwordstate_passwords.each(&:delete)
       true
     rescue Passwordstate::NotFoundError
