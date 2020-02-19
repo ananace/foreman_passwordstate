@@ -93,18 +93,20 @@ module ForemanPasswordstate
     def host_pass(username, password_hash: 'SHA256', create: true, **params)
       return nil unless passwordstate_facet
 
+      password_hash ||= 'SHA256'
+      raise ArgumentError, 'Unknown password hash algorithm' unless PasswordCrypt::ALGORITHMS.key? password_hash
+
       # As template renders read the root password multiple times,
       # add a short cache just to not thoroughly hammer the passwordstate server
       PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 30.minutes) do
         pw = password_entry(username, create: create, **params)
-        alg = password_hash || 'SHA256'
-        if alg == 'Base64'
-          pw = PasswordCrypt.passw_crypt(pw.password, alg)
-        elsif alg == 'None'
+        if password_hash == 'Base64'
+          pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
+        elsif password_hash == 'None'
           pw = pw.password
         else
           seed = "#{passwordstate_facet.id}:#{id}@#{passwordstate_server.id}/#{passwordstate_facet.password_list_id}/#{pw.password_id}"
-          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[alg]}#{Base64.strict_encode64(Digest::SHA1.digest(seed))}")
+          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{Base64.strict_encode64(Digest::SHA1.digest(seed))}")
         end
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
         pw
