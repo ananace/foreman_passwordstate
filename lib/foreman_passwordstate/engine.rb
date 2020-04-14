@@ -63,8 +63,8 @@ module ForemanPasswordstate
              caption: N_('Passwordstate Servers'),
              parent: :infrastructure_menu
 
-        register_facet ForemanPasswordstate::PasswordstateHostFacet, :passwordstate_facet do
-          configure_host do
+        register_facet :passwordstate_facet, nil do
+          configure_host ForemanPasswordstate::PasswordstateHostFacet do
             # extend_model ForemanPasswordstate::HostManagedExtensions # The #root_pass override fails if done here
             add_tabs passwordstate_facet: 'foreman_passwordstate/passwordstate_facets/passwordstate_facet'
           end
