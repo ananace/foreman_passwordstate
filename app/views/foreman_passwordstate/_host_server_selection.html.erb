@@ -1,5 +1,5 @@
 <%-
-  item = controller_name == 'hosts' ? @host : @hostgroup
+  item = %w[hosts discovered_hosts].include?(controller_name) ? @host : @hostgroup
   facet = item.try(:passwordstate_facet)
 
   if !(item.persisted? rescue false)

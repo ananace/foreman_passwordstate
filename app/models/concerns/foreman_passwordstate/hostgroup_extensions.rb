@@ -34,18 +34,5 @@ module ForemanPasswordstate
 
       f
     end
-
-    def inherited_facet_attributes(facet_config)
-      return super unless facet_config.name == :passwordstate_facet
-      inherited_attributes = send(facet_config.name)&.inherited_attributes || {}
-
-      hostgroup_ancestry_cache.reverse_each do |hostgroup|
-        hg_facet = hostgroup.send(facet_config.name)
-        next unless hg_facet
-        inherited_attributes.merge!(hg_facet.inherited_attributes) { |_, left, right| left || right }
-      end
-
-      inherited_attributes
-    end
   end
 end
