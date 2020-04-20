@@ -98,7 +98,7 @@ module ForemanPasswordstate
 
       # As template renders read the root password multiple times,
       # add a short cache just to not thoroughly hammer the passwordstate server
-      PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 30.minutes) do
+      PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 60.minutes) do
         pw = password_entry(username, create: create, **params)
         if password_hash == 'Base64'
           pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
