@@ -71,22 +71,25 @@ module ForemanPasswordstate
       # TODO: If Hosts enabled
       # pw = list.search(host_name: name, user_name: 'root')
 
-      stable_pw_desc = "#{id}:#{passwordstate_server.id}/foreman"
-      pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{stable_pw_desc}"
+      stable_pw_desc = " #{id}:#{passwordstate_server.id}/foreman"
+      pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{stable_pw_desc.strip}"
       begin
-        list.passwords.search(params.merge(description: stable_pw_desc, user_name: username)).first
+        pw = list.passwords.search(params.merge(description: stable_pw_desc, user_name: username)).select { |e| e.description.ends_with? stable_pw_desc }.first
+        pw ||= list.passwords.create params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true) if create
+
+        pw
       rescue Passwordstate::NotFoundError => e
         return list.passwords.create params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true) if create
 
-        raise e
+        raise
       end
     end
 
     def passwordstate_passwords
       return nil unless passwordstate_facet
 
-      stable_pw_desc = "#{id}:#{passwordstate_server.id}/foreman"
-      passwordstate_password_list(_bare: true).passwords.search(description: "#{id}:#{passwordstate_server.id}/foreman", exclude_password: true)
+      stable_pw_desc = " #{id}:#{passwordstate_server.id}/foreman"
+      passwordstate_password_list(_bare: true).passwords.search(description: stable_pw_desc, exclude_password: true).select { |e| e.description.ends_with? stable_pw_desc }
     end
 
 
