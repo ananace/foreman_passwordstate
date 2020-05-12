@@ -38,15 +38,17 @@ function update_passwordstate_server(element) {
 function update_passwordstate_list(element) {
   var element = $(element);
 
-  if (element[0].options.length == 0) {
-    $('#passwordstate_list_select').hide();
-  } else {
-    $('#passwordstate_list_select').show();
-  }
+  if (element.length > 0) {
+    if (element[0].options.length == 0) {
+      $('#passwordstate_list_select').hide();
+    } else {
+      $('#passwordstate_list_select').show();
+    }
 
-  if (element.val()) {
-    $('#root_password').hide();
-  } else {
-    $('#root_password').show();
+    if (element.val()) {
+      $('#root_password').hide();
+    } else {
+      $('#root_password').show();
+    }
   }
 }
