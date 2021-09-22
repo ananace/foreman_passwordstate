@@ -109,7 +109,7 @@ module ForemanPasswordstate
           pw = pw.password
         else
           seed = "#{passwordstate_facet.id}:#{id}@#{passwordstate_server.id}/#{passwordstate_facet.password_list_id}/#{pw.password_id}"
-          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{Base64.strict_encode64(Digest::SHA1.digest(seed))}")
+          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{Base64.strict_encode64(Digest::SHA1.digest(seed)).gsub('+', '.')}")
         end
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
         pw
