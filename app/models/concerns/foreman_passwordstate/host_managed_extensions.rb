@@ -93,23 +93,24 @@ module ForemanPasswordstate
     end
 
 
-    def host_pass(username, password_hash: 'SHA256', create: true, **params)
+    def host_pass(username, password_hash: nil, create: true, **params)
       return nil unless passwordstate_facet
 
-      password_hash ||= 'SHA256'
-      raise ArgumentError, 'Unknown password hash algorithm' unless PasswordCrypt::ALGORITHMS.key? password_hash
+      password_hash ||= 'None'
+      raise ArgumentError, 'Unknown password hash algorithm' if password_hash != 'None' && !PasswordCrypt::ALGORITHMS.key?(password_hash)
 
       # As template renders read the root password multiple times,
       # add a short cache just to not thoroughly hammer the passwordstate server
       PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 60.minutes) do
         pw = password_entry(username, create: create, **params)
-        if password_hash == 'Base64'
-          pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
-        elsif password_hash == 'None'
+        if password_hash == 'None'
           pw = pw.password
+        elsif password_hash == 'Base64' || password_hash == 'Base64-Windows'
+          pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
         else
           seed = "#{passwordstate_facet.id}:#{id}@#{passwordstate_server.id}/#{passwordstate_facet.password_list_id}/#{pw.password_id}"
-          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{Base64.strict_encode64(Digest::SHA1.digest(seed)).gsub('+', '.')}")
+          seed = Base64.strict_encode64(Digest::SHA1.digest(seed)).tr('+', '.')
+          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{seed}")
         end
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
         pw
@@ -144,4 +145,8 @@ module ForemanPasswordstate
     end
 
   end
+end
+
+class Host::Managed::Jail < Safemode::Jail
+  allow :host_pass
 end
