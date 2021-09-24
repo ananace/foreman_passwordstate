@@ -7,7 +7,7 @@ module Api
       authorize_host_by_client_cert %i[acquire release]
 
       before_action :find_host, only: %i[acquire release]
-      before_action :find_resource, only: %i[acquire release]
+      before_action :find_resource, only: %i[acquire]
 
       def_param_group :password do
         param :user, String, required: true, desc: N_('The username of the password to request')
@@ -21,10 +21,14 @@ module Api
         render json: @password.attributes
       end
 
-      api :POST, '/passwords', N_('Release a password')
+      api :DELETE, '/passwords/:user', N_('Release a password')
       param_group :password
       def release
-
+        pw = @host.password_entry(password_params[:user], create: false)
+        pw.delete
+        render plain: ''
+      rescue Passwordstate::NotFoundError => ex
+        not_found ex
       end
 
       private
@@ -48,7 +52,7 @@ module Api
 
         @password = @host.password_entry(password_params[:user], opts)
       rescue StandardError => e
-        Foreamn::Logging.exception('Failed to acquire password', e)
+        Foreman::Logging.exception('Failed to acquire password', e)
         false
       end
 
