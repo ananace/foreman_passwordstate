@@ -5,7 +5,7 @@ Rails.application.routes.draw do
                      apiv: /v1|v2/,
                      constraints: ApiConstraints.new(version: 2) do
       get 'passwords/:user', to: 'passwords#acquire'
-      post 'passwords/:user', to: 'passwords#release'
+      delete 'passwords/:user', to: 'passwords#release'
     end
   end
 

@@ -16,9 +16,12 @@ module Api
       api :GET, '/passwords/:user', N_('Acquire a password')
       param_group :password
       param :create, :bool, required: false, desc: N_('Should the password be created if it does not exist')
+      param :json, :bool, required: false, desc: N_('Retrieve the password as a JSON object')
       param :hash, String, required: false, desc: N_('The hash algorithm to use on the password')
       def acquire
-        render json: @password.attributes
+        return render json: @password.attributes if password_params[:json]
+
+        render plain: @password.password
       end
 
       api :DELETE, '/passwords/:user', N_('Release a password')
@@ -26,7 +29,6 @@ module Api
       def release
         pw = @host.password_entry(password_params[:user], create: false)
         pw.delete
-        render plain: ''
       rescue Passwordstate::NotFoundError => ex
         not_found ex
       end
@@ -51,9 +53,12 @@ module Api
         }.compact
 
         @password = @host.password_entry(password_params[:user], opts)
+      rescue Passwordstate::NotFoundError => ex
+        not_found ex
+        nil
       rescue StandardError => e
         Foreman::Logging.exception('Failed to acquire password', e)
-        false
+        nil
       end
 
       def find_host
@@ -85,7 +90,7 @@ module Api
       end
 
       def password_params
-        to_permit = %i[user create hash]
+        to_permit = %i[user create hash json]
         to_permit += %i[certname hostname] unless detected_host
 
         params.permit to_permit
