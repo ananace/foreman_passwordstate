@@ -16,8 +16,21 @@
 <%= fields_for item do |f| %>
 <%= f.fields_for 'passwordstate_facet_attributes' do |f| %>
   <%-
-    servers = PasswordstateServer.all.map do |server|
-      [ server.id, "#{server.name} - #{server.url}" ]
+    begin
+      servers = PasswordstateServer.all.map do |server|
+        name = "#{server.name} - #{server.url}"
+        name += " (not available)" unless server.test_connection
+        [ server.id, name ]
+      end
+    rescue StandardError => e
+  -%>
+<!--
+Errors occured during rendering;
+<%= e.class %>: <%= e %>
+<%= e.backtrace.join "\n" %>
+-->
+  <%-
+      servers = []
     end
     server_id = facet.try :passwordstate_server_id rescue nil
   -%>

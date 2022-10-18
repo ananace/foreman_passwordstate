@@ -22,7 +22,7 @@ module ForemanPasswordstate
     def password_list(**query)
       return nil unless password_list_id
 
-      passwordstate_server.password_lists.get(password_list_id, query)
+      passwordstate_server.password_lists.get(password_list_id, **query)
     end
   end
 end

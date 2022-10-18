@@ -16,6 +16,8 @@ module ForemanPasswordstate
 
       @host.remove_passwordstate_passwords!
       @host.passwordstate_facet.destroy
+    rescue StandardError => e
+      logger.error "Failed to update passwordstate facet, #{e.class}: #{e}"
     end
 
     def passwordstate_server_selected

@@ -48,6 +48,8 @@ class PasswordstateServer < ApplicationRecord
     return false unless url
 
     client.valid?
+  rescue StandardError
+    false
   end
 
   def folders
