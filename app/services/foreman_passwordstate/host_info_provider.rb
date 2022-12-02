@@ -1,7 +1,7 @@
-module ForemanPasswordstate
-  class HostInfoProvider < HostInfo::Provider # inherit the base class
+# frozen_string_literal: true
 
-    # override this method according to principles specified below
+module ForemanPasswordstate
+  class HostInfoProvider < HostInfo::Provider
     def host_info
       return {} unless host.passwordstate_facet
 
@@ -9,12 +9,13 @@ module ForemanPasswordstate
       root_user = host.operatingsystem&.root_user || 'root'
       host.host_pass(root_user, password_hash: host.operatingsystem&.password_hash)
 
-      params = { 'parameters' => {
+      params = {
+        'parameters' => {
           'passwordstate' => {
             'server' => host.passwordstate_server.name,
             'server_url' => host.passwordstate_server.url,
             'list' => host.passwordstate_password_list.title,
-            'list_path' => host.passwordstate_password_list.full_path,
+            'list_path' => host.passwordstate_password_list.full_path
           }
         }
       }

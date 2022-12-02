@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PasswordstateServer < ApplicationRecord
   include ForemanPasswordstate::PasswordstateCaching
   include Taxonomix
@@ -44,7 +46,7 @@ class PasswordstateServer < ApplicationRecord
 
   delegate :version, :passwords, to: :client
 
-  def test_connection(options = {})
+  def test_connection(**_)
     return false unless url
 
     client.valid?
@@ -81,6 +83,10 @@ class PasswordstateServer < ApplicationRecord
       # Only handle a single password list if using API keys
       client.password_lists.tap do |list|
         list.instance_eval <<-CODE, __FILE__, __LINE__ + 1
+        # def lazy_load
+        #   load [get('username', { _force: true })]
+        # end
+
         def lazy_load
           load [get(#{user}, { _force: true })]
         end
@@ -94,8 +100,8 @@ class PasswordstateServer < ApplicationRecord
     URI.join client.server_url, "plid=#{pwlist.password_list_id}"
   end
 
-  def get_password_url(pw)
-    URI.join client.server_url, "pid=#{pw.password_id}"
+  def get_password_url(password)
+    URI.join client.server_url, "pid=#{password.password_id}"
   end
 
   private

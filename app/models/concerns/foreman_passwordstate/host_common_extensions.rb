@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module HostCommonExtensions
     def crypt_root_pass

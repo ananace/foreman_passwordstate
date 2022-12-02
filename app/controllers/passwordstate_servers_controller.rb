@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PasswordstateServersController < ::ApplicationController
   include Foreman::Controller::AutoCompleteSearch
   include Foreman::Controller::Parameters::PasswordstateServer

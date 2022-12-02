@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   class Engine < ::Rails::Engine
     engine_name 'foreman_passwordstate'
@@ -21,23 +23,23 @@ module ForemanPasswordstate
 
         security_block :foreman_passwordstate do
           permission :view_passwordstate_servers, {
-            :'passwordstate_servers' => %i[index show],
+            passwordstate_servers: %i[index show]
           }, resource_type: 'PasswordstateServer'
 
           permission :create_passwordstate_servers, {
-            :'passwordstate_servers' => %i[new create],
+            passwordstate_servers: %i[new create]
           }, resource_type: 'PasswordstateServer'
 
           permission :edit_passwordstate_servers, {
-            :'passwordstate_servers' => %i[edit],
+            passwordstate_servers: %i[edit]
           }, resource_type: 'PasswordstateServer'
 
           permission :delete_passwordstate_servers, {
-            :'passwordstate_servers' => %i[destroy],
+            passwordstate_servers: %i[destroy]
           }, resource_type: 'PasswordstateServer'
 
           permission :full_passwordstate_password_access, {
-            :'api/v2/passwords' => %i[acquire release]
+            'api/v2/passwords': %i[acquire release]
           }
 
           # permission :view_hosts,
@@ -50,7 +52,7 @@ module ForemanPasswordstate
         ]
 
         role 'Passwordstate server viewer', %i[view_passwordstate_servers]
-        role 'Passwordstate server manager', %i[view_passwordstate_servers create_passwordstate_servers edit_passwordstate_servers delete_passwordstate_servers ]
+        role 'Passwordstate server manager', %i[view_passwordstate_servers create_passwordstate_servers edit_passwordstate_servers delete_passwordstate_servers]
 
         # Only meant for a puppetmaster user, to retrieve passwords into the catalog
         role 'Password manager', %i[full_passwordstate_password_access]
@@ -95,15 +97,13 @@ module ForemanPasswordstate
     end
 
     config.to_prepare do
-      begin
-        Host::Managed.send(:prepend, ForemanPasswordstate::HostManagedExtensions)
-        Hostgroup.send(:prepend, ForemanPasswordstate::HostgroupExtensions)
-        HostsController.send(:prepend, ForemanPasswordstate::HostsControllerExtensions)
-        HostgroupsController.send(:prepend, ForemanPasswordstate::HostgroupsControllerExtensions)
-        Operatingsystem.send(:prepend, ForemanPasswordstate::OperatingsystemExtensions)
-      rescue StandardError => e
-        Rails.logger.fatal "foreman_passwordstate: skipping engine hook (#{e})"
-      end
+      Host::Managed.prepend ForemanPasswordstate::HostManagedExtensions
+      Hostgroup.prepend ForemanPasswordstate::HostgroupExtensions
+      HostsController.prepend ForemanPasswordstate::HostsControllerExtensions
+      HostgroupsController.prepend ForemanPasswordstate::HostgroupsControllerExtensions
+      Operatingsystem.prepend ForemanPasswordstate::OperatingsystemExtensions
+    rescue StandardError => e
+      Rails.logger.fatal "foreman_passwordstate: skipping engine hook (#{e})"
     end
   end
 end

@@ -4,6 +4,7 @@ module ForemanPasswordstate
   # Trimmed copy of Foreman's ComputeResourceCache
   class PasswordstateCache
     attr_accessor :owner, :cache_duration
+
     delegate :logger, to: ::Rails
 
     def initialize(owner, cache_duration: 60.minutes)
@@ -77,8 +78,8 @@ module ForemanPasswordstate
 
     def cache_options
       {
-        :expires_in => cache_duration,
-        :race_condition_ttl => 1.minute,
+        expires_in: cache_duration,
+        race_condition_ttl: 1.minute
       }
     end
   end

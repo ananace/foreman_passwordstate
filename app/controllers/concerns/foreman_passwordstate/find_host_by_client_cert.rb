@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module FindHostByClientCert
     extend ActiveSupport::Concern
 
     module ClassMethods
       def authorize_host_by_client_cert(actions, _options = {})
-        skip_before_action :require_login, :only => actions, :raise => false
-        skip_before_action :authorize, :only => actions
-        skip_before_action :verify_authenticity_token, :only => actions
-        skip_before_action :set_taxonomy, :only => actions, :raise => false
-        skip_before_action :session_expiry, :update_activity_time, :only => actions
-        before_action(:only => actions) { require_client_cert_or_login }
+        skip_before_action :require_login, only: actions, raise: false
+        skip_before_action :authorize, only: actions
+        skip_before_action :verify_authenticity_token, only: actions
+        skip_before_action :set_taxonomy, only: actions, raise: false
+        skip_before_action :session_expiry, :update_activity_time, only: actions
+        before_action(only: actions) { require_client_cert_or_login }
         attr_reader :detected_host
       end
     end
@@ -28,7 +30,7 @@ module ForemanPasswordstate
 
       require_login
       unless User.current
-        render_error 'unauthorized', :status => :unauthorized unless performed? && api_request?
+        render_error 'unauthorized', status: :unauthorized unless performed? && api_request?
         return false
       end
       authorize
@@ -53,7 +55,7 @@ module ForemanPasswordstate
       end
 
       dn = request.env[Setting[:ssl_client_dn_env]]
-      return unless dn && dn =~ /CN=([^\s\/,]+)/i
+      return unless dn && dn =~ %r{CN=([^\s/,]+)}i
 
       hostname = Regexp.last_match(1).downcase
       logger.debug "Extracted hostname '#{hostname}' from client certificate."

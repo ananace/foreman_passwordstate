@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module HostgroupExtensions
     def self.prepended(base)

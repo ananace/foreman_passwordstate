@@ -1,13 +1,14 @@
 ---
 AllCops:
-  TargetRubyVersion: 2.3
-  TargetRailsVersion: 5.1
+  TargetRubyVersion: 2.7
+  NewCops: enable
   Exclude:
     - '*.spec'
     - 'Rakefile'
 
-Rails:
-  Enabled: true
+# Rails:
+#   Enabled: true
+#   TargetRailsVersion: 6.0
 
 # Don't enforce documentation
 Style/Documentation:
@@ -19,8 +20,8 @@ Metrics/MethodLength:
 Metrics/LineLength:
   Max: 190
 
-Rails/SkipsModelValidations:
-  Enabled: false
+# Rails/SkipsModelValidations:
+#   Enabled: false
 
 Lint/BooleanSymbol:
   Enabled: false
@@ -43,16 +44,17 @@ Style/FormatStringToken:
 Naming/AccessorMethodName:
   Enabled: false
 
-Performance/FixedSize:
-  Exclude:
-    - 'test/**/*'
-
 Metrics/BlockLength:
-  Max: 35
+  Max: 45
   Exclude:
     - 'test/**/*'
 
 Metrics/ClassLength:
+  Max: 200
+  Exclude:
+    - 'test/**/*'
+
+Metrics/ModuleLength:
   Max: 200
   Exclude:
     - 'test/**/*'

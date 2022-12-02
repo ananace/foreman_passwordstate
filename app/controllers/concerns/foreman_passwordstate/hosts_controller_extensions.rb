@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module HostsControllerExtensions
     def self.prepended(base)
@@ -30,8 +32,8 @@ module ForemanPasswordstate
 
     def passwordstate_passwords_tab_selected
       render partial: 'foreman_passwordstate/passwords_tab_pane_content'
-    rescue ActionView::Template::Error => exception
-      process_ajax_error exception, 'fetch managed passwords'
+    rescue ActionView::Template::Error => e
+      process_ajax_error e, 'fetch managed passwords'
     end
 
     private
@@ -48,4 +50,3 @@ module ForemanPasswordstate
     end
   end
 end
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module HostgroupsControllerExtensions
     def update
@@ -20,4 +22,3 @@ module ForemanPasswordstate
     end
   end
 end
-

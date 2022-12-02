@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module HostManagedExtensions
     def self.prepended(base)
@@ -55,7 +57,7 @@ module ForemanPasswordstate
 
       # Skip writing root_pass in the serialized object
       options ||= {}
-      if !options[:only]
+      unless options[:only]
         options[:except] ||= []
         options[:except] << :root_pass
       end
@@ -78,7 +80,7 @@ module ForemanPasswordstate
         pw ||= list.passwords.create(**params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true)) if create
 
         pw
-      rescue Passwordstate::NotFoundError => e
+      rescue Passwordstate::NotFoundError
         return list.passwords.create(**params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true)) if create
 
         raise
@@ -92,7 +94,6 @@ module ForemanPasswordstate
       passwordstate_password_list(_bare: true).passwords.search(description: stable_pw_desc, exclude_password: true).select { |e| e.description.ends_with? stable_pw_desc }
     end
 
-
     def host_pass(username, password_hash: nil, create: true, **params)
       return nil unless passwordstate_facet
 
@@ -103,9 +104,10 @@ module ForemanPasswordstate
       # add a short cache just to not thoroughly hammer the passwordstate server
       PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 60.minutes) do
         pw = password_entry(username, create: create, **params)
-        if password_hash == 'None'
+        case password_hash
+        when 'None'
           pw = pw.password
-        elsif password_hash == 'Base64' || password_hash == 'Base64-Windows'
+        when 'Base64', 'Base64-Windows'
           pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
         else
           seed = "#{passwordstate_facet.id}:#{id}@#{passwordstate_server.id}/#{passwordstate_facet.password_list_id}/#{pw.password_id}"
@@ -126,13 +128,13 @@ module ForemanPasswordstate
       host_pass(root_user, password_hash: operatingsystem&.password_hash)
     rescue StandardError => e
       logger.error "Failed to get root_pass for #{self} - #{e.class}: #{e}"
-      return Digest::SHA256.hexdigest("#{id}-PlaceholderDueToPasswordstateError")
+      Digest::SHA256.hexdigest("#{id}-PlaceholderDueToPasswordstateError")
     end
 
     def remove_passwordstate_passwords!
       return unless passwordstate_facet
 
-      logger.info "Removing Passwordstate passwords..."
+      logger.info 'Removing Passwordstate passwords...'
 
       passwordstate_passwords.each(&:delete)
       true
@@ -146,10 +148,9 @@ module ForemanPasswordstate
 
       super
     end
-
   end
 end
 
-class Host::Managed::Jail < Safemode::Jail
+class Host::Managed::Jail < Safemode::Jail # rubocop:disable Style/ClassAndModuleChildren
   allow :host_pass
 end

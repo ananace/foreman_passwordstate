@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V2
     class PasswordsController < V2::BaseController
@@ -29,8 +31,8 @@ module Api
       def release
         pw = @host.password_entry(password_params[:user], create: false)
         pw.delete
-      rescue Passwordstate::NotFoundError => ex
-        not_found ex
+      rescue Passwordstate::NotFoundError => e
+        not_found e
       end
 
       private
@@ -53,8 +55,8 @@ module Api
         }.compact
 
         @password = @host.password_entry(password_params[:user], opts)
-      rescue Passwordstate::NotFoundError => ex
-        not_found ex
+      rescue Passwordstate::NotFoundError => e
+        not_found e
         nil
       rescue StandardError => e
         Foreman::Logging.exception('Failed to acquire password', e)
