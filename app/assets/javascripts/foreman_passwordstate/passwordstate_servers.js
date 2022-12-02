@@ -14,14 +14,14 @@ function testConnection(item) {
   $.ajax({
     type: 'post',
     url: $(item).attr('data-url'),
-    data: `${$('form').serialize()}`,
-    success(result) {
-      $('#test_connection_button').attr('class', 'btn btn-success');
+    data: $('form').serialize().toString(),
+    success() {
+      $('#test_connection_button').attr('class', 'btn btn-success').attr('title', '');
     },
     error({ statusText }) {
-      $('#test_connection_button').attr('class', 'btn btn-warning');
+      $('#test_connection_button').attr('class', 'btn btn-warning').attr('title', statusText.toString());
     },
-    complete(result) {
+    complete() {
       // $('#test_connection_indicator').hide();
     },
   });
