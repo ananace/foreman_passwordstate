@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPasswordstateServers < ActiveRecord::Migration[5.1]
   def change
     create_table :passwordstate_servers do |t|
@@ -21,7 +23,7 @@ class AddPasswordstateServers < ActiveRecord::Migration[5.1]
       t.timestamps null: false
     end
 
-    add_index :passwordstate_host_facets, [:host_id, :passwordstate_server_id], name: 'idx_pwstate_host', unique: true
+    add_index :passwordstate_host_facets, %i[host_id passwordstate_server_id], name: 'idx_pwstate_host', unique: true
 
     create_table :passwordstate_hostgroup_facets do |t|
       t.references :passwordstate_server, null: false, foreign_key: true, index: { name: :idx_pwstate_hostgroup_by_pwstate_server }
@@ -32,6 +34,6 @@ class AddPasswordstateServers < ActiveRecord::Migration[5.1]
       t.timestamps null: false
     end
 
-    add_index :passwordstate_hostgroup_facets, [:hostgroup_id, :passwordstate_server_id], name: 'idx_pwstate_hostgroup', unique: true
+    add_index :passwordstate_hostgroup_facets, %i[hostgroup_id passwordstate_server_id], name: 'idx_pwstate_hostgroup', unique: true
   end
 end

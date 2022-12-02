@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     scope '(:apiv)', module: :v2,
@@ -10,7 +12,7 @@ Rails.application.routes.draw do
   end
 
   scope '/foreman_passwordstate' do
-    constraints(id: %r{[^\/]+}) do
+    constraints(id: %r{[^/]+}) do
       resources :passwordstate_servers do
         collection do
           get 'auto_complete_search'
@@ -24,7 +26,7 @@ Rails.application.routes.draw do
     end
   end
 
-  constraints(id: %r{[^\/]+}) do
+  constraints(id: %r{[^/]+}) do
     resources :hostgroups, only: [] do
       collection do
         post 'passwordstate_server_selected'
