@@ -18,8 +18,8 @@ function testConnection(item) {
     success: function() {
       $('#test_connection_button').attr('class', 'btn btn-success').attr('title', '');
     },
-    error: function({ statusText }) {
-      $('#test_connection_button').attr('class', 'btn btn-warning').attr('title', statusText.toString());
+    error: function(result) {
+      $('#test_connection_button').attr('class', 'btn btn-warning').attr('title', result.toString());
     },
     complete: function() {
       // $('#test_connection_indicator').hide();
