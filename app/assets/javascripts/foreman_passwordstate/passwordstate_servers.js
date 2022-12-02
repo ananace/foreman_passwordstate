@@ -3,7 +3,7 @@ $(function() {
 });
 
 function show_authorization_form(self) {
-  let select = $(self);
+  select = $(self);
   $('fieldset.authorization_form').hide();
   $('#passwordstate_' + select.val()).show();
 }
