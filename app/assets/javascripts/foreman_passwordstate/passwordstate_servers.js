@@ -15,13 +15,13 @@ function testConnection(item) {
     type: 'post',
     url: $(item).attr('data-url'),
     data: $('form').serialize().toString(),
-    success() {
+    success: function() {
       $('#test_connection_button').attr('class', 'btn btn-success').attr('title', '');
     },
-    error({ statusText }) {
+    error: function({ statusText }) {
       $('#test_connection_button').attr('class', 'btn btn-warning').attr('title', statusText.toString());
     },
-    complete() {
+    complete: function() {
       // $('#test_connection_indicator').hide();
     },
   });
