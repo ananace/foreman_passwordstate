@@ -21,7 +21,7 @@ module ForemanPasswordstate
                       only_explicit: true
 
         before_destroy :remove_passwordstate_passwords!
-        # after_update :ensure_passwordstate_passwords
+        after_update :ensure_passwordstate_passwords
       end
     end
 
@@ -73,7 +73,6 @@ module ForemanPasswordstate
       # TODO: If Hosts enabled
       # pw = list.search(host_name: name, user_name: 'root')
 
-      stable_pw_desc = " #{id}:#{passwordstate_server.id}/foreman"
       pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{stable_pw_desc.strip}"
       begin
         pw = list.passwords.search(**params.merge(description: stable_pw_desc, user_name: username)).select { |e| e.description.ends_with? stable_pw_desc }.first
@@ -90,7 +89,6 @@ module ForemanPasswordstate
     def passwordstate_passwords
       return nil unless passwordstate_facet
 
-      stable_pw_desc = " #{id}:#{passwordstate_server.id}/foreman"
       passwordstate_password_list(_bare: true).passwords.search(description: stable_pw_desc, exclude_password: true).select { |e| e.description.ends_with? stable_pw_desc }
     end
 
@@ -131,6 +129,20 @@ module ForemanPasswordstate
       Digest::SHA256.hexdigest("#{id}-PlaceholderDueToPasswordstateError")
     end
 
+    def ensure_passwordstate_passwords
+      return unless passwordstate_facet
+
+      logger.info 'Ensuring Passwordstate passwords are up-to-date...'
+
+      passwordstate_passwords.each do |password|
+        password.title = "#{password.username}@#{fqdn}"
+        password.description = "Foreman managed password for #{password.username} on #{fqdn} | #{stable_pw_desc.strip}"
+        next unless password.send(:modified).any?
+
+        password.put
+      end
+    end
+
     def remove_passwordstate_passwords!
       return unless passwordstate_facet
 
@@ -147,6 +159,12 @@ module ForemanPasswordstate
       return if passwordstate_facet
 
       super
+    end
+
+    private
+
+    def stable_pw_desc
+      " #{id}:#{passwordstate_server.id}/foreman"
     end
   end
 end
