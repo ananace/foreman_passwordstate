@@ -135,12 +135,14 @@ module ForemanPasswordstate
       logger.info 'Ensuring Passwordstate passwords are up-to-date...'
 
       passwordstate_passwords.each do |password|
-        password.title = "#{password.username}@#{fqdn}"
-        password.description = "Foreman managed password for #{password.username} on #{fqdn} | #{stable_pw_desc.strip}"
+        password.title = "#{password.user_name}@#{fqdn}"
+        password.description = "Foreman managed password for #{password.user_name} on #{fqdn} | #{stable_pw_desc.strip}"
         next unless password.send(:modified).any?
 
         password.put
       end
+
+      true
     end
 
     def remove_passwordstate_passwords!
