@@ -47,9 +47,7 @@ module ForemanPasswordstate
           #   resource_type: 'Host'
         end
 
-        Foreman::AccessControl.permission(:view_hosts).actions.concat %w[
-          hosts/passwordstate_passwords_tab_selected
-        ]
+        Foreman::AccessControl.permission(:view_hosts).actions << 'hosts/passwordstate_passwords_tab_selected'
 
         role 'Passwordstate server viewer', %i[view_passwordstate_servers]
         role 'Passwordstate server manager', %i[view_passwordstate_servers create_passwordstate_servers edit_passwordstate_servers delete_passwordstate_servers]
