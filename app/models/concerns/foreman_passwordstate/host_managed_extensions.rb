@@ -131,6 +131,7 @@ module ForemanPasswordstate
 
     def ensure_passwordstate_passwords
       return unless passwordstate_facet
+      return unless saved_change_to_name?
 
       logger.info 'Ensuring Passwordstate passwords are up-to-date...'
 
