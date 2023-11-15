@@ -1,4 +1,7 @@
 ---
+variables:
+  CI_EXTRA_PLUGIN_DEPENDENCIES: "gem 'passwordstate', git: 'https://gitlab.liu.se/ITI/ruby-passwordstate'"
+
 include:
   - project: ITI/ci-pipelines
     file: '/foreman-module.yaml'
