@@ -17,6 +17,7 @@ module ForemanPasswordstate
       end
     end
 
+    # rubocop:disable Metrics/BlockLength
     initializer 'foreman_passwordstate.register_plugin', before: :finisher_hook do |_app|
       Foreman::Plugin.register :foreman_passwordstate do
         requires_foreman '>= 3.6'
@@ -103,6 +104,7 @@ module ForemanPasswordstate
         end
       end
     end
+    # rubocop:enable Metrics/BlockLength
 
     # Precompile any JS or CSS files under app/assets/
     # If requiring files from each other, list them explicitly here to avoid precompiling the same
