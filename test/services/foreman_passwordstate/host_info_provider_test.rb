@@ -12,7 +12,7 @@ class ForemanPasswordstate::HostInfoProviderTest < ActiveSupport::TestCase
     test 'it generates reasonable passwordstate info' do
       assert host.passwordstate_facet
 
-      pwlist = FactoryBot.build(:passwordstate_password_list)
+      pwlist = ::Passwordstate::Resources::PasswordList.new(password_list_id: 5, password_list: 'Test', tree_path: '\\Passwords' 
       get_pwlist = stub_request(:get, 'https://passwordstate.localhost.localdomain/winapi/passwordlists/5')
       host.passwordstate_facet.stubs(:password_list).returns(pwlist)
       host.stubs(:host_pass) # Avoid server availability testing
