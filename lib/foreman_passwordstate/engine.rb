@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'deface'
+
 module ForemanPasswordstate
   class Engine < ::Rails::Engine
     engine_name 'foreman_passwordstate'
@@ -17,7 +19,7 @@ module ForemanPasswordstate
 
     initializer 'foreman_passwordstate.register_plugin', before: :finisher_hook do |_app|
       Foreman::Plugin.register :foreman_passwordstate do
-        requires_foreman '>= 1.16'
+        requires_foreman '>= 3.6'
 
         apipie_documented_controllers ["#{ForemanPasswordstate::Engine.root}/app/controllers/api/v2/*.rb"]
 
@@ -66,15 +68,39 @@ module ForemanPasswordstate
         register_facet ForemanPasswordstate::PasswordstateHostFacet, :passwordstate_facet do
           configure_host do
             # extend_model ForemanPasswordstate::HostManagedExtensions # The #root_pass override fails if done here
-            add_tabs passwordstate_facet: 'foreman_passwordstate/passwordstate_facets/passwordstate_facet'
+
+            add_tabs passwords: 'foreman_passwordstate/passwords_tab_pane'
+            set_dependent_action :destroy
           end
-          configure_hostgroup ForemanPasswordstate::PasswordstateHostgroupFacet
+
+          configure_hostgroup ForemanPasswordstate::PasswordstateHostgroupFacet do
+            set_dependent_action :destroy
+          end
         end
 
         register_info_provider ForemanPasswordstate::HostInfoProvider
 
         parameter_filter Host::Managed, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
         parameter_filter Hostgroup, passwordstate_facet_attributes: %i[passwordstate_server_id password_list_id]
+
+        extend_page('hosts/show') do |ctx|
+          ctx.add_pagelet(
+            :main_tabs,
+            name: 'Passwords',
+            partial: 'foreman_passwordstate/passwords_tab_pane_content',
+            onlyif: proc { |host| host.passwordstate_facet }
+          )
+        end
+        %i[host hostgroup].each do |res|
+          extend_page("#{res}s/_form") do |ctx|
+            ctx.add_pagelet(
+              :main_tab_fields,
+              name: 'add_passwordstate_server_selection',
+              partial: 'foreman_passwordstate/host_server_selection',
+              resource_type: res
+            )
+          end
+        end
       end
     end
 
@@ -96,7 +122,6 @@ module ForemanPasswordstate
 
     config.to_prepare do
       Host::Managed.prepend ForemanPasswordstate::HostManagedExtensions
-      Hostgroup.prepend ForemanPasswordstate::HostgroupExtensions
       HostsController.prepend ForemanPasswordstate::HostsControllerExtensions
       HostgroupsController.prepend ForemanPasswordstate::HostgroupsControllerExtensions
       Operatingsystem.prepend ForemanPasswordstate::OperatingsystemExtensions

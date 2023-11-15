@@ -2,30 +2,27 @@
 
 module ForemanPasswordstate
   module HostsControllerExtensions
-    def self.prepended(base)
-      base.class_eval do
-        before_action :find_resource_with_passwordstate, only: %i[passwordstate_passwords_tab_selected]
+    extend ActiveSupport::Concern
 
-        alias_method :find_resource_with_passwordstate, :find_resource
-      end
+    prepended do
+      before_action :find_resource_with_passwordstate, only: %i[passwordstate_passwords_tab_selected]
+
+      alias_method :find_resource_with_passwordstate, :find_resource
     end
 
     def update
-      super
+      ret = super
 
-      return unless host_params.dig(:passwordstate_facet_attributes, :passwordstate_server_id).empty?
-      return unless @host.passwordstate_facet
+      return ret unless host_params.dig(:passwordstate_facet_attributes, :passwordstate_server_id).empty?
 
-      @host.remove_passwordstate_passwords!
-      @host.passwordstate_facet.destroy
-    rescue StandardError => e
-      logger.error "Failed to update passwordstate facet, #{e.class}: #{e}"
+      remove_passwordstate_facet
+
+      ret
     end
 
     def passwordstate_server_selected
-      host = @host || item_object
-      passwordstate_facet = host.passwordstate_facet || host.build_passwordstate_facet
-      passwordstate_facet.passwordstate_server_id ||= (params[:passwordstate_facet] || params[:host])[:passwordstate_server_id]
+      object = @host || item_object
+      passwordstate_facet = object.ensure_passwordstate_facet(save: false, **host_params[:passwordstate_facet_attributes])
 
       render partial: 'foreman_passwordstate/host_password_choice', locals: { item: passwordstate_facet }
     end
@@ -37,6 +34,16 @@ module ForemanPasswordstate
     end
 
     private
+
+    def remove_passwordstate_facet
+      return unless host.passwordstate_facet
+
+      host.remove_passwordstate_passwords!
+      host.passwordstate_facet.destroy
+      host.update passwordstate_facet_id: nil
+    rescue StandardError => e
+      logger.error "Failed to remove passwordstate facet, #{e.class}: #{e} - #{e.backtrace}"
+    end
 
     def action_permission
       case params[:action]

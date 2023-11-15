@@ -17,7 +17,9 @@ function update_passwordstate_server(element) {
   var url = $(element).attr('data-url');
   var type = $(element).attr('data-type');
   var attrs = {};
-  attrs[type] = attribute_hash(['passwordstate_server_id']);
+  attrs[type] = {
+    passwordstate_facet_attributes: attribute_hash(['passwordstate_server_id'])
+  };
   $('#root_password').show();
   tfm.tools.showSpinner();
   $.ajax({
@@ -38,7 +40,7 @@ function update_passwordstate_server(element) {
 function update_passwordstate_list(element) {
   var element = $(element);
 
-  if (element.length > 0) {
+  //if (element.length > 0) {
     if (element[0].options.length == 0) {
       $('#passwordstate_list_select').hide();
     } else {
@@ -50,5 +52,5 @@ function update_passwordstate_list(element) {
     } else {
       $('#root_password').show();
     }
-  }
+  //}
 }

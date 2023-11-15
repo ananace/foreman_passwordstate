@@ -2,8 +2,8 @@
 
 require 'test_plugin_helper'
 
-class HostTest < ActiveSupport::TestCase
-  let(:os) { FactoryBot.build(:operatingsystem, name: 'Redhat', major: 7).becomes(Redhat) }
+class ManagedHostTest < ActiveSupport::TestCase
+  let(:os) { FactoryBot.build(:operatingsystem, name: 'Redhat', major: 7, password_hash: 'SHA256').becomes(Redhat) }
 
   context 'with Passwordstate link' do
     let(:pwsrv) { PasswordstateServer.new id: 1 }
@@ -25,7 +25,7 @@ class HostTest < ActiveSupport::TestCase
 
       host.expects(:password_entry).with('root', create: true).returns password
 
-      assert_equal '$5$GOaEWuCfsHMPpxca$UKV.6AnLVIlOw4szcCokGkB6yzXBV26/iWFCCo5yf19', host.root_pass
+      assert_equal '$5$G1Yt9FE6v1CwY.XD$1maU5v3PXPfhgEAnb9ghVOPAcGpei/LeIUsh6m0rB07', host.root_pass
     end
 
     test 'it handles persistent errors "gracefully"' do

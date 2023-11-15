@@ -2,124 +2,37 @@
 
 module ForemanPasswordstate
   module HostManagedExtensions
-    def self.prepended(base)
-      base.class_eval do
-        # TODO
-        # after_build :ensure_passwordstate_host
-        # before_provision :remove_passwordstate_host
+    extend ActiveSupport::Concern
 
-        has_one :passwordstate_facet,
-                class_name: '::ForemanPasswordstate::PasswordstateHostFacet',
-                foreign_key: :host_id,
-                inverse_of: :host,
-                dependent: :destroy
+    prepended do
+      include ::Orchestration::Passwordstate
 
-        scoped_search on: :passwordstate_server_id,
-                      relation: :passwordstate_facet,
-                      rename: :passwordstate_server,
-                      complete_value: true,
-                      only_explicit: true
-
-        before_destroy :remove_passwordstate_passwords!
-        after_update :ensure_passwordstate_passwords
-      end
+      scoped_search on: :passwordstate_server_id,
+                    relation: :passwordstate_facet,
+                    rename: :passwordstate_server,
+                    complete_value: true,
+                    only_explicit: true
     end
 
-    delegate :passwordstate_server, to: :passwordstate_facet
-    delegate :password_list, to: :passwordstate_facet, prefix: :passwordstate
+    def ensure_passwordstate_facet(save: true, **attrs)
+      return passwordstate_facet if passwordstate_facet && attrs.empty?
 
-    def ensure_passwordstate_facet(force_inherit: false, **attrs)
-      return passwordstate_facet if passwordstate_facet && attrs.empty? && !force_inherit
-
-      if force_inherit
-        attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet]).merge(attrs) if hostgroup
-        attrs = passwordstate_facet.attributes.merge(attrs) if passwordstate_facet
-      else
-        attrs = passwordstate_facet.attributes.merge(attrs) if passwordstate_facet
-        attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet]).merge(attrs) if hostgroup
-      end
+      attrs = passwordstate_facet.attributes.merge(attrs) if passwordstate_facet
+      attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet]).merge(attrs) if hostgroup
 
       if passwordstate_facet
         f = passwordstate_facet
-        f.update_attributes attrs
+        f.assign_attributes attrs
       else
         f = build_passwordstate_facet attrs
       end
-      f.save if persisted?
+      f.save if save && persisted?
 
       f
     end
 
-    # FIXME
-    def serializable_hash(options = nil)
-      return super unless passwordstate_facet
-      return super unless caller.include? "/usr/share/foreman/app/controllers/api/v2/hosts_controller.rb:289:in `facts'"
-
-      # Skip writing root_pass in the serialized object
-      options ||= {}
-      unless options[:only]
-        options[:except] ||= []
-        options[:except] << :root_pass
-      end
-
-      super options
-    end
-
-    def password_entry(username, create: true, **params)
-      return nil unless passwordstate_facet
-
-      list = passwordstate_password_list(_bare: true)
-
-      # TODO: If Hosts enabled
-      # pw = list.search(host_name: name, user_name: 'root')
-
-      pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{stable_pw_desc.strip}"
-      begin
-        pw = list.passwords.search(**params.merge(description: stable_pw_desc, user_name: username)).select { |e| e.description.ends_with? stable_pw_desc }.first
-        pw ||= list.passwords.create(**params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true)) if create
-
-        pw
-      rescue Passwordstate::NotFoundError
-        return list.passwords.create(**params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true)) if create
-
-        raise
-      end
-    end
-
-    def passwordstate_passwords
-      return nil unless passwordstate_facet
-
-      passwordstate_password_list(_bare: true).passwords.search(description: stable_pw_desc, exclude_password: true).select { |e| e.description.ends_with? stable_pw_desc }
-    end
-
-    def host_pass(username, password_hash: nil, create: true, **params)
-      return nil unless passwordstate_facet
-
-      password_hash ||= 'None'
-      raise ArgumentError, 'Unknown password hash algorithm' if password_hash != 'None' && !PasswordCrypt::ALGORITHMS.key?(password_hash)
-
-      # As template renders read the root password multiple times,
-      # add a short cache just to not thoroughly hammer the passwordstate server
-      PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 60.minutes) do
-        pw = password_entry(username, create: create, **params)
-        case password_hash
-        when 'None'
-          pw = pw.password
-        when 'Base64', 'Base64-Windows'
-          pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
-        else
-          seed = "#{passwordstate_facet.id}:#{id}@#{passwordstate_server.id}/#{passwordstate_facet.password_list_id}/#{pw.password_id}"
-          seed = Base64.strict_encode64(Digest::SHA1.digest(seed)).tr('+', '.')
-          pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{seed}")
-        end
-        pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
-        pw
-      end
-    end
-
     def root_pass
       return super unless passwordstate_facet
-
       return 'PlaceholderDuringCreation' if !persisted? || domain.nil?
 
       root_user = operatingsystem&.root_user || 'root'
@@ -129,45 +42,10 @@ module ForemanPasswordstate
       Digest::SHA256.hexdigest("#{id}-PlaceholderDueToPasswordstateError")
     end
 
-    def ensure_passwordstate_passwords
-      return unless passwordstate_facet
-      return unless saved_change_to_name?
-
-      logger.info 'Ensuring Passwordstate passwords are up-to-date...'
-
-      passwordstate_passwords.each do |password|
-        password.title = "#{password.user_name}@#{fqdn}"
-        password.description = "Foreman managed password for #{password.user_name} on #{fqdn} | #{stable_pw_desc.strip}"
-        next unless password.send(:modified).any?
-
-        password.put
-      end
-
-      true
-    end
-
-    def remove_passwordstate_passwords!
-      return unless passwordstate_facet
-
-      logger.info 'Removing Passwordstate passwords...'
-
-      passwordstate_passwords.each(&:delete)
-      true
-    rescue Passwordstate::NotFoundError
-      true
-    end
-
-    # Skip encrypting the root password if it's read from passwords
     def crypt_root_pass
-      return if passwordstate_facet
+      return if passwordstate?
 
       super
-    end
-
-    private
-
-    def stable_pw_desc
-      " #{id}:#{passwordstate_server.id}/foreman"
     end
   end
 end

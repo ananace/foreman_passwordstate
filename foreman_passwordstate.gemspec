@@ -15,11 +15,6 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir['{app,config,db,lib}/**/*.*'] + %w[LICENSE.txt Rakefile README.md]
 
-  spec.add_dependency 'deface', '< 2.0'
+  spec.add_dependency 'deface'
   spec.add_dependency 'passwordstate', '~> 0'
-
-  spec.add_development_dependency 'rubocop'
-  spec.add_development_dependency 'rubocop-minitest'
-  spec.add_development_dependency 'rubocop-performance'
-  spec.add_development_dependency 'rubocop-rails'
 end

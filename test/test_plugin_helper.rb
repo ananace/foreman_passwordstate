@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
-# This calls the main test_helper in Foreman-core
-require 'test_helper'
-require 'database_cleaner'
+if ENV['COVERAGE']
+  require 'simplecov'
 
-# Add plugin to FactoryBot's paths
-FactoryBot.definition_file_paths << File.join(File.dirname(__FILE__), 'factories')
-FactoryBot.reload
+  SimpleCov.start 'rails' do
+    root File.dirname(__dir__)
 
-# Foreman's setup doesn't handle cleaning up for Minitest::Spec
-DatabaseCleaner.strategy = :transaction
+    add_group 'Interactors', '/app/interactors'
+    add_group 'Services', '/app/services'
 
-class Minitest::Spec
-  before :each do
-    DatabaseCleaner.start
-  end
-
-  after :each do
-    DatabaseCleaner.clean
+    formatter SimpleCov::Formatter::SimpleFormatter if ENV['CI']
   end
 end
+
+# This calls the main test_helper in Foreman-core
+require 'test_helper'
+
+# Add plugin to FactoryBot's paths
+FactoryBot.definition_file_paths << File.join(__dir__, 'factories')
+FactoryBot.reload
