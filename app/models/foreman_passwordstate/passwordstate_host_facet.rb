@@ -18,6 +18,7 @@ module ForemanPasswordstate
       passwordstate_server.password_lists.get(password_list_id, **query)
     end
 
+    # FOREMAN-37043
     def self.inherited_attributes(hostgroup, facet_attributes)
       facet_attributes.merge(super) { |_, left, right| left || right }
     end
