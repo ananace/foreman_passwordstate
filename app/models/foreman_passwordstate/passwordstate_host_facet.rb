@@ -20,7 +20,7 @@ module ForemanPasswordstate
 
     # FOREMAN-37043
     def self.inherited_attributes(hostgroup, facet_attributes)
-      facet_attributes.merge(super) { |_, left, right| left || right }
+      (facet_attributes || {}).merge(super) { |_, left, right| left || right }
     end
   end
 end
