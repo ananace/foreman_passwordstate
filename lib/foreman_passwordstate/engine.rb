@@ -102,6 +102,8 @@ module ForemanPasswordstate
             )
           end
         end
+
+        logger :sync, enabled: true
       end
     end
     # rubocop:enable Metrics/BlockLength
