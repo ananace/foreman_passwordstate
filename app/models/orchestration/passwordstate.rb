@@ -48,6 +48,13 @@ module Orchestration
       end
     end
 
+    def passwordstate_passwords
+      passwordstate_password_list(_bare: true)
+        .passwords
+        .search(description: stable_pw_desc, exclude_password: true)
+        .select { |e| e.description.ends_with? stable_pw_desc }
+    end
+
     private
 
     def stable_pw_desc
@@ -71,13 +78,6 @@ module Orchestration
 
         raise
       end
-    end
-
-    def passwordstate_passwords
-      passwordstate_password_list(_bare: true)
-        .passwords
-        .search(description: stable_pw_desc, exclude_password: true)
-        .select { |e| e.description.ends_with? stable_pw_desc }
     end
 
     def passwordstate_facet_empty?
