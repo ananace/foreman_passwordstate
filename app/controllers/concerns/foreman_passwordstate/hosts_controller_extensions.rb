@@ -36,11 +36,11 @@ module ForemanPasswordstate
     private
 
     def remove_passwordstate_facet
-      return unless host.passwordstate_facet
+      return unless @host.passwordstate_facet
 
-      host.remove_passwordstate_passwords!
-      host.passwordstate_facet.destroy
-      host.update passwordstate_facet_id: nil
+      @host.remove_passwordstate_passwords!
+      @host.passwordstate_facet.destroy
+      @host.update passwordstate_facet_id: nil
     rescue StandardError => e
       logger.error "Failed to remove passwordstate facet, #{e.class}: #{e} - #{e.backtrace}"
     end
