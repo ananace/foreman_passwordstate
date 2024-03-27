@@ -109,7 +109,7 @@ class PasswordstateServer < ApplicationRecord
   def client
     require 'passwordstate'
 
-    @client ||= Passwordstate::Client.new(url, api_type: api_type.to_sym, timeout: 10).tap do |cl|
+    @client ||= Passwordstate::Client.new(url, api_type: api_type.to_sym, open_timeout: 5, timeout: 10).tap do |cl|
       if api_type.to_sym == :api
         cl.auth_data = { apikey: password }
       else
