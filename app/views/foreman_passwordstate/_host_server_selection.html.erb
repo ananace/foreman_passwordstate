@@ -1,13 +1,21 @@
 <%-
   item = %w[hosts discovered_hosts].include?(controller_name) ? @host : @hostgroup
-  facet = item.try(:passwordstate_facet)
+  facet = item&.passwordstate_facet
 
-  if !(item.persisted? rescue false)
-    hostgroup = @hostgroup || @host.hostgroup
+  inherited = false
+  if !item&.persisted?
+    hostgroup = @hostgroup || @host&.hostgroup
     inherited = facet.nil?
     inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])&.any?
 
-    facet ||= item.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])) if inherited && hostgroup
+    facet ||= item&.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])) if inherited && hostgroup
+  end
+  inherited ||= true if facet.nil?
+
+  servers = PasswordstateServer.all.map do |server|
+    name = "#{server.name} - #{server.url}"
+    name += " (not available)" unless server.test_connection
+    [ server.id, name ]
   end
 -%>
 
@@ -15,33 +23,13 @@
 
 <%= fields_for item do |f| %>
 <%= f.fields_for 'passwordstate_facet_attributes' do |f| %>
-  <%-
-    begin
-      servers = PasswordstateServer.all.map do |server|
-        name = "#{server.name} - #{server.url}"
-        name += " (not available)" unless server.test_connection
-        [ server.id, name ]
-      end
-    rescue StandardError => e
-  -%>
-<!--
-Errors occured during rendering;
-<%= e.class %>: <%= e %>
-<%= e.backtrace.join "\n" %>
--->
-  <%-
-      servers = []
-    end
-    server_id = facet.try :passwordstate_server_id rescue nil
-  -%>
   <%= select_f f, :passwordstate_server_id, servers, :first, :last,
     { include_blank: true,
-      selected: server_id,
-      # disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
-      # disable_button_enabled: inherited,
+      selected: facet&.server_id,
+      disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+      disable_button_enabled: inherited,
     },
-    { disabled: servers.empty?,
-      help_inline: :indicator,
+    { help_inline: :indicator,
       label: _('Passwordstate Server'),
       label_help: _("<b>NB</b>: Selecting a Passwordstate server will replace ALL password handling<br/>Resetting this option will clear ALL passwords"),
       label_help_options: { data: { placement: 'top' } },
