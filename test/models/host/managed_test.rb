@@ -21,7 +21,7 @@ class ManagedHostTest < ActiveSupport::TestCase
 
       password = mock('Passwordstate::Password')
       password.stubs(:password_id).returns 5
-      password.expects(:password).returns 'ExamplePassword'
+      password.stubs(:password).returns 'ExamplePassword'
 
       host.expects(:password_entry).with('root', create: true).returns password
 

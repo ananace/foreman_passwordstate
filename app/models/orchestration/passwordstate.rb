@@ -41,6 +41,7 @@ module Orchestration
             passwordstate_facet.password_list_id, pw.password_id
           ].join ':'
           seed = Base64.strict_encode64(Digest::SHA1.digest(seed)).tr('+', '.')
+          puts "Encrypting #{pw.password} with #{seed} (#{password_hash})"
           pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{seed}")
         end
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
