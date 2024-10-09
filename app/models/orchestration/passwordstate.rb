@@ -28,7 +28,7 @@ module Orchestration
 
       # As template renders read the root password multiple times,
       # add a short cache to not hammer the passwordstate server
-      ForemanPasswordstate::PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 60.minutes) do
+      ret = ForemanPasswordstate::PasswordstatePasswordsCache.instance.fetch("#{cache_key}/pass-#{username}/#{password_hash}", expires_in: 60.minutes) do
         pw = password_entry(username, create: create, **params)
         case password_hash
         when 'None'
@@ -47,6 +47,8 @@ module Orchestration
         pw.force_encoding(Encoding::UTF_8) if pw.encoding != Encoding::UTF_8
         pw
       end
+    ensure
+      puts "Returning #{ret.inspect} from encryption"
     end
 
     def passwordstate_passwords

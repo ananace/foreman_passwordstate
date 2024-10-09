@@ -25,7 +25,7 @@ class ManagedHostTest < ActiveSupport::TestCase
 
       host.expects(:password_entry).with('root', create: true).returns password
 
-      assert_equal '$5$G1Yt9FE6v1CwY.XD$1maU5v3PXPfhgEAnb9ghVOPAcGpei/LeIUsh6m0rB07', host.root_pass
+      assert_equal '$5$b3jfHuNnvG3KP0Li$tC30snobVKIv059KdooVLHRV0xM/VMTzB9dtaQlRBn8', host.root_pass
     end
 
     test 'it handles persistent errors "gracefully"' do
