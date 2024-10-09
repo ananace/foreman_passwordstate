@@ -37,10 +37,10 @@ module Orchestration
           pw = PasswordCrypt.passw_crypt(pw.password, password_hash)
         else
           seed = [
-            passwordstate_facet.id, id, passwordstate_server.id,
-            passwordstate_facet.password_list_id, pw.password_id
+            pw.password_id, passwordstate_facet.password_list_id,
+            passwordstate_facet.id, id, passwordstate_server.id
           ].join ':'
-          seed = Base64.strict_encode64(Digest::SHA1.digest(seed)).tr('+', '.')
+          seed = Base64.strict_encode64(Digest::SHA1.digest(seed)).gsub(%r{[^a-zA-Z0-9./]}, '.')
           puts "Encrypting #{pw.password} with #{seed} (#{password_hash})"
           pw = pw.password.crypt("#{PasswordCrypt::ALGORITHMS[password_hash]}#{seed}")
         end
