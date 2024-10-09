@@ -5,7 +5,7 @@ module ForemanPasswordstate
     extend ActiveSupport::Concern
 
     included do
-      after_update :refresh_cache_ignoring_errors, if: proc { |cr| cr.caching_enabled? }
+      after_update :refresh_cache_ignoring_errors, if: proc(&:caching_enabled?)
     end
 
     def caching_enabled?

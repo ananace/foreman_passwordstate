@@ -17,7 +17,7 @@ Style/Documentation:
 Metrics/MethodLength:
   Max: 40
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 190
 
 # Rails/SkipsModelValidations:

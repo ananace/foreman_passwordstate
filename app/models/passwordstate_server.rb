@@ -84,7 +84,7 @@ class PasswordstateServer < ApplicationRecord
       client.password_lists.tap do |list|
         list.instance_eval <<-CODE, __FILE__, __LINE__ + 1
         def lazy_load
-          load [get(#{user}, _force: true)]
+          load [get(#{user}, _force: true)] # load [get(15, _force: true)]
         rescue StandardError => ex
           client.logger.error "Failed to load entries for password list - \#{ex.class}: \#{ex}"
           load []
