@@ -6,6 +6,7 @@ A plugin to delegate host password handling from Foreman to a Passwordstate inst
 
 | Foreman Version | Plugin Version |
 | --------------- | -------------- |
+| >= 3.12         | >=0.3.0        |
 | >= 1.17         | any            |
 
 ## Installation
