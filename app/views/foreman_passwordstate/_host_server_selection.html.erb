@@ -25,7 +25,7 @@
 <%= f.fields_for 'passwordstate_facet_attributes' do |f| %>
   <%= select_f f, :passwordstate_server_id, servers, :first, :last,
     { include_blank: true,
-      selected: facet&.server_id,
+      selected: facet&.passwordstate_server_id,
       disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
       disable_button_enabled: inherited,
     },
