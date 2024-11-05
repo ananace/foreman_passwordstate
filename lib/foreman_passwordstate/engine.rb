@@ -28,6 +28,9 @@ module ForemanPasswordstate
       HostsController.prepend ForemanPasswordstate::HostsControllerExtensions
       HostgroupsController.prepend ForemanPasswordstate::HostgroupsControllerExtensions
       Operatingsystem.prepend ForemanPasswordstate::OperatingsystemExtensions
+      if Foreman::Plugin.installed?('foreman_discovery')
+        DiscoveredHostsController.prepend ForemanPasswordstate::HostsControllerExtensions
+      end
     rescue StandardError => e
       Rails.logger.fatal "foreman_passwordstate: skipping engine hook (#{e})"
     end
