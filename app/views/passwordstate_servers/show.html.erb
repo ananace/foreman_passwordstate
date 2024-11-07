@@ -76,7 +76,7 @@
       <%- @passwordstate_server.password_lists.each do |list| -%>
         <tr>
           <td><%= list.password_list %></td>
-          <td><a href="<%= @passwordstate_server.get_list_url(list)  %>" target="_blank"><%= list.full_path(true) %></a></td>
+          <td><a href="<%= @passwordstate_server.get_list_url(list)  %>" target="_blank"><%= list.full_path(unix: true) %></a></td>
           <td><%= list.description %></td>
         </tr>
       <%- end -%>
