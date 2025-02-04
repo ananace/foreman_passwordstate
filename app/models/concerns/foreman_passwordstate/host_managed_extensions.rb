@@ -38,7 +38,8 @@ module ForemanPasswordstate
       root_user = operatingsystem&.root_user || 'root'
       host_pass(root_user, password_hash: operatingsystem&.password_hash)
     rescue StandardError => e
-      logger.error "Failed to get root_pass for #{self} - #{e.class}: #{e}"
+      fullmessage = e.to_s.tr("\n", '½')
+      logger.error "Failed to get root_pass for #{self} - #{e.class}: #{fullmessage}"
       Digest::SHA256.hexdigest("#{id}-PlaceholderDueToPasswordstateError")
     end
 
