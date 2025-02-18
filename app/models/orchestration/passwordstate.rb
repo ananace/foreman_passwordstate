@@ -10,6 +10,8 @@ module Orchestration
       # before_provision :remove_passwordstate_host, if: :passwordstate?
 
       before_destroy :remove_passwordstate_passwords!, if: :passwordstate?
+      # TODO - Remove passwords from old list if list ID is changing
+      # before_update :remove_outdated_passwords, if: :passwordstate?
       after_update :ensure_passwordstate_passwords, if: :saved_change_to_name?
     end
 
