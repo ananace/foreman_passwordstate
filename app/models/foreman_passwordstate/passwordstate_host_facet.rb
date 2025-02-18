@@ -3,6 +3,7 @@
 module ForemanPasswordstate
   class PasswordstateHostFacet < ApplicationRecord
     include Facets::Base
+    include ForemanPasswordstate::PasswordlistEnsurance
 
     belongs_to :passwordstate_server,
                class_name: '::PasswordstateServer',

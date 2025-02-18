@@ -39,7 +39,7 @@ class PasswordstateServer < ApplicationRecord
   validates :url, presence: true
   validates :api_type, presence: true
 
-  # TODO: Validate User + Password or only APIKey
+  validate :validate_api_configuration
 
   scoped_search on: :name
   default_scope -> { order('passwordstate_servers.name') }
@@ -123,6 +123,18 @@ class PasswordstateServer < ApplicationRecord
         cl.auth_data = { username: username, password: password }
         cl.auth_data[:domain] = domain if domain
       end
+    end
+  end
+
+  def validate_api_configuration
+    errors.add(:api_type, 'must be valid') unless %i[winapi api].include?(api_type.to_sym)
+
+    if api_type.to_sym == :api
+      errors.add(:password, 'must provide a valid API Key') unless password.size == 32
+      errors.add(:user, 'must be a valid Password List ID') unless user.to_i.to_s == user
+    else
+      errors.add(:user, 'must provide a username') if user.empty?
+      errors.add(:password, 'must provide a password') if password.empty?
     end
   end
 end
