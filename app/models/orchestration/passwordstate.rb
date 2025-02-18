@@ -10,7 +10,7 @@ module Orchestration
       # before_provision :remove_passwordstate_host, if: :passwordstate?
 
       before_destroy :remove_passwordstate_passwords!, if: :passwordstate?
-      # TODO - Remove passwords from old list if list ID is changing
+      # TODO: Remove passwords from old list if list ID is changing
       # before_update :remove_outdated_passwords, if: :passwordstate?
       after_update :ensure_passwordstate_passwords, if: :saved_change_to_name?
     end
@@ -71,12 +71,12 @@ module Orchestration
 
       pw_desc = "Foreman managed password for #{username} on #{fqdn} | #{stable_pw_desc.strip}"
       begin
-        pw = list.passwords.search(**params.merge(description: stable_pw_desc, user_name: username)).select { |e| e.description.ends_with? stable_pw_desc }.first
-        pw ||= list.passwords.create(**params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true)) if create
+        pw = list.passwords.search(**params, description: stable_pw_desc, user_name: username).select { |e| e.description.ends_with? stable_pw_desc }.first
+        pw ||= list.passwords.create(**params, title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true) if create
 
         pw
       rescue ::Passwordstate::NotFoundError
-        return list.passwords.create(**params.merge(title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true)) if create
+        return list.passwords.create(**params, title: "#{username}@#{fqdn}", description: pw_desc, user_name: username, generate_password: true) if create
 
         raise
       end

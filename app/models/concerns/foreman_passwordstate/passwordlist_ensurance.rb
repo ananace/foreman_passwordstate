@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPasswordstate
   module PasswordlistEnsurance
     extend ActiveSupport::Concern

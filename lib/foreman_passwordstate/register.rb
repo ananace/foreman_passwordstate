@@ -71,7 +71,7 @@ Foreman::Plugin.register :foreman_passwordstate do
       :main_tabs,
       name: 'Passwords',
       partial: 'foreman_passwordstate/passwords_tab_pane_content',
-      onlyif: proc { |host| host.passwordstate_facet } # rubocop:disable Style/SymbolProc - Does not work with caller
+      onlyif: proc { |host| host.passwordstate_facet } # rubocop:disable Style/SymbolProc -- Does not work with caller
     )
   end
   %i[host hostgroup].each do |res|
