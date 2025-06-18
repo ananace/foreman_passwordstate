@@ -55,6 +55,8 @@ module Orchestration
         .passwords
         .search(description: stable_pw_desc, exclude_password: true)
         .select { |e| e.description.ends_with? stable_pw_desc }
+    rescue Passwordstate::NotFoundError
+      []
     end
 
     private
